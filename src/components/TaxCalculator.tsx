@@ -23,6 +23,7 @@ import {
   validateMonths 
 } from "@/lib/formatters";
 import confetti from "canvas-confetti";
+import ReactCountryFlag from "react-country-flag";
 
 export function TaxCalculator() {
   const [grossIncome, setGrossIncome] = useState<string>("75,00,000");
@@ -167,15 +168,15 @@ export function TaxCalculator() {
 
   return (
     <TooltipProvider>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/50 to-indigo-50 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden">
         {/* Enhanced Background Effects */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-100/20 via-transparent to-indigo-100/20" />
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-200/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-200/10 rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-100/20 via-transparent to-indigo-100/20 dark:from-blue-900/10 dark:via-transparent dark:to-indigo-900/10" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-200/10 dark:bg-blue-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-200/10 dark:bg-indigo-500/5 rounded-full blur-3xl" />
         
         {/* Header */}
         <motion.div 
-          className="relative z-10 text-center py-16 px-4"
+          className="relative z-10 text-center py-8 sm:py-12 lg:py-16 px-4"
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
@@ -184,18 +185,27 @@ export function TaxCalculator() {
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mb-6"
+            className="mb-4 sm:mb-6"
           >
-            <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-6 leading-tight">
-              🇮🇳 Indian Income Tax Calculator
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-display font-medium lg:font-semibold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-3 sm:mb-4 lg:mb-6 leading-tight flex items-center justify-center gap-3 sm:gap-4">
+              <ReactCountryFlag 
+                countryCode="IN" 
+                svg 
+                style={{
+                  width: '1.8em',
+                  height: '1.35em',
+                }}
+                className="shadow-lg rounded-sm"
+              />
+              Indian Income Tax Calculator
             </h1>
-            <div className="text-2xl md:text-3xl font-semibold text-gray-700 mb-2">
+            <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-display font-normal md:font-medium text-gray-700 dark:text-gray-300 mb-2">
               Financial Year 2025-26
             </div>
           </motion.div>
           
           <motion.p 
-            className="text-xl md:text-2xl text-gray-600 mb-8 max-w-4xl mx-auto leading-relaxed"
+            className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 dark:text-gray-400 mb-6 sm:mb-8 max-w-4xl mx-auto leading-relaxed px-2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -210,49 +220,49 @@ export function TaxCalculator() {
           >
             <Badge 
               variant="outline" 
-              className="bg-gradient-to-r from-green-50 to-emerald-50 text-green-800 border-green-300 px-6 py-3 text-lg font-medium shadow-lg"
+              className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600 px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm lg:text-base font-normal shadow-lg"
             >
-              <Sparkles className="w-5 h-5 mr-2" />
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
               New Tax Regime - FY 2025-26
             </Badge>
           </motion.div>
         </motion.div>
 
-        <div className="relative z-10 max-w-6xl mx-auto px-4 pb-16">
+        <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-4 pb-12 sm:pb-16">
           {/* Calculator Card */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <Card className="mb-12 shadow-2xl border-0 bg-white/90 backdrop-blur-xl ring-1 ring-gray-200/50 overflow-hidden">
+            <Card className="mb-8 sm:mb-12 shadow-2xl border-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl ring-1 ring-gray-200/50 dark:ring-gray-700/50 overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500" />
               
-              <CardHeader className="pb-8">
-                <CardTitle className="flex items-center gap-3 text-3xl font-bold text-gray-800">
-                  <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl text-white shadow-lg">
-                    <Calculator className="w-8 h-8" />
+              <CardHeader className="pb-6 sm:pb-8">
+                <CardTitle className="flex items-center gap-2 sm:gap-3 text-xl sm:text-2xl font-display font-medium lg:font-semibold text-gray-800 dark:text-gray-100">
+                  <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl text-white shadow-lg">
+                    <Calculator className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   Tax Calculator
                 </CardTitle>
               </CardHeader>
               
-              <CardContent className="space-y-8">
-                <div className="grid md:grid-cols-2 gap-8">
+              <CardContent className="space-y-6 sm:space-y-8">
+                <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
                   {/* Income Input */}
                   <motion.div 
-                    className="space-y-4"
+                    className="space-y-3 sm:space-y-4"
                     initial={{ opacity: 0, x: -30 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.6, delay: 0.4 }}
                   >
-                    <Label htmlFor="income" className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                      <span className="text-2xl">💰</span>
+                    <Label htmlFor="income" className="text-base sm:text-lg font-normal md:font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                      <span className="text-xl sm:text-2xl">💰</span>
                       Annual Income
                     </Label>
                     
                     <div className="relative group">
-                      <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-bold text-lg z-10">
+                      <span className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400 font-normal md:font-medium text-base sm:text-lg z-10">
                         ₹
                       </span>
                       <Input
@@ -263,10 +273,10 @@ export function TaxCalculator() {
                         onFocus={() => setFocusedInput('income')}
                         onBlur={() => setFocusedInput(null)}
                         onKeyPress={(e) => e.key === 'Enter' && handleCalculate()}
-                        className={`pl-10 pr-6 py-8 text-xl font-bold border-2 transition-all duration-300 bg-white ${
+                        className={`pl-8 sm:pl-10 pr-4 sm:pr-6 py-6 sm:py-8 text-lg sm:text-xl font-normal md:font-medium border-2 transition-all duration-300 bg-white dark:bg-gray-800 ${
                           focusedInput === 'income' 
                             ? 'border-blue-500 shadow-lg ring-4 ring-blue-500/20 scale-[1.02]' 
-                            : 'border-gray-200 hover:border-gray-300'
+                            : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                         }`}
                         placeholder="0"
                       />
@@ -282,7 +292,7 @@ export function TaxCalculator() {
                     
                     <div className="flex items-start gap-2">
                       <InfoIcon className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm text-gray-600 leading-relaxed">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed font-normal">
                         Your total annual income from all sources (salary, business, freelance, etc.)
                       </p>
                     </div>
@@ -297,10 +307,10 @@ export function TaxCalculator() {
                         >
                           <div className={`p-3 rounded-lg border-l-4 ${
                             getValidationMessage('income').type === 'success' 
-                              ? 'bg-green-50 border-green-400 text-green-700' :
+                              ? 'bg-green-50 dark:bg-green-900/20 border-green-400 text-green-700 dark:text-green-300' :
                             getValidationMessage('income').type === 'warning' 
-                              ? 'bg-yellow-50 border-yellow-400 text-yellow-700' :
-                              'bg-red-50 border-red-400 text-red-700'
+                              ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-400 text-yellow-700 dark:text-yellow-300' :
+                              'bg-red-50 dark:bg-red-900/20 border-red-400 text-red-700 dark:text-red-300'
                           }`}>
                             <p className="text-sm font-medium">
                               {getValidationMessage('income').message}
@@ -317,9 +327,9 @@ export function TaxCalculator() {
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: -15, scale: 0.95 }}
                           transition={{ duration: 0.4, ease: "easeOut" }}
-                          className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl shadow-sm"
+                          className="p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-xl shadow-sm"
                         >
-                          <p className="text-sm text-blue-800 font-medium leading-relaxed">{amountInWords}</p>
+                          <p className="text-sm text-blue-800 dark:text-blue-300 font-normal leading-relaxed">{amountInWords}</p>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -327,18 +337,18 @@ export function TaxCalculator() {
 
                   {/* Months Input */}
                   <motion.div 
-                    className="space-y-4"
+                    className="space-y-3 sm:space-y-4"
                     initial={{ opacity: 0, x: 30 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.6, delay: 0.5 }}
                   >
-                    <Label htmlFor="months" className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                      <span className="text-2xl">📅</span>
+                    <Label htmlFor="months" className="text-base sm:text-lg font-normal md:font-medium text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                      <span className="text-xl sm:text-2xl">📅</span>
                       Income Period (Months)
                     </Label>
                     
                     <div className="relative group">
-                      <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600 text-lg z-10">
+                      <span className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400 text-base sm:text-lg z-10">
                         📅
                       </span>
                       <Input
@@ -351,10 +361,10 @@ export function TaxCalculator() {
                         onFocus={() => setFocusedInput('months')}
                         onBlur={() => setFocusedInput(null)}
                         onKeyPress={(e) => e.key === 'Enter' && handleCalculate()}
-                        className={`pl-12 pr-6 py-8 text-xl font-bold border-2 transition-all duration-300 bg-white ${
+                        className={`pl-10 sm:pl-12 pr-4 sm:pr-6 py-6 sm:py-8 text-lg sm:text-xl font-normal md:font-medium border-2 transition-all duration-300 bg-white dark:bg-gray-800 ${
                           focusedInput === 'months' 
                             ? 'border-blue-500 shadow-lg ring-4 ring-blue-500/20 scale-[1.02]' 
-                            : 'border-gray-200 hover:border-gray-300'
+                            : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
                         }`}
                       />
                       
@@ -369,7 +379,7 @@ export function TaxCalculator() {
                     
                     <div className="flex items-start gap-2">
                       <InfoIcon className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm text-gray-600 leading-relaxed">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed font-normal">
                         Number of months you earned income (useful for partial year calculations)
                       </p>
                     </div>
@@ -384,10 +394,10 @@ export function TaxCalculator() {
                         >
                           <div className={`p-3 rounded-lg border-l-4 ${
                             getValidationMessage('months').type === 'success' 
-                              ? 'bg-green-50 border-green-400 text-green-700' :
+                              ? 'bg-green-50 dark:bg-green-900/20 border-green-400 text-green-700 dark:text-green-300' :
                             getValidationMessage('months').type === 'warning' 
-                              ? 'bg-yellow-50 border-yellow-400 text-yellow-700' :
-                              'bg-red-50 border-red-400 text-red-700'
+                              ? 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-400 text-yellow-700 dark:text-yellow-300' :
+                              'bg-red-50 dark:bg-red-900/20 border-red-400 text-red-700 dark:text-red-300'
                           }`}>
                             <p className="text-sm font-medium">
                               {getValidationMessage('months').message}
@@ -403,23 +413,23 @@ export function TaxCalculator() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.6 }}
-                  className="pt-4"
+                  className="pt-2 sm:pt-4"
                 >
                   <Button 
                     onClick={handleCalculate}
                     disabled={isCalculating}
-                    className="w-full py-8 text-xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-300 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    className="w-full py-6 sm:py-8 text-lg sm:text-xl font-normal md:font-medium bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 transform hover:scale-[1.02] transition-all duration-300 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
                     {isCalculating ? (
-                      <div className="flex items-center gap-3">
-                        <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin" />
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="w-5 h-5 sm:w-6 sm:h-6 border-3 border-white border-t-transparent rounded-full animate-spin" />
                         <span>Calculating your tax...</span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-3">
-                        <Calculator className="w-6 h-6" />
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <Calculator className="w-5 h-5 sm:w-6 sm:h-6" />
                         <span>Calculate Tax</span>
-                        <Sparkles className="w-5 h-5" />
+                        <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
                       </div>
                     )}
                   </Button>
@@ -437,23 +447,23 @@ export function TaxCalculator() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -60 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="space-y-8"
+                className="space-y-6 sm:space-y-8"
               >
                 {/* Tax Summary */}
-                <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-xl ring-1 ring-gray-200/50 overflow-hidden">
+                <Card className="shadow-2xl border-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl ring-1 ring-gray-200/50 dark:ring-gray-700/50 overflow-hidden">
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500" />
                   
-                  <CardHeader className="pb-6">
-                    <CardTitle className="flex items-center gap-3 text-3xl font-bold text-gray-800">
-                      <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl text-white shadow-lg">
-                        <DollarSign className="w-8 h-8" />
+                  <CardHeader className="pb-4 sm:pb-6">
+                    <CardTitle className="flex items-center gap-2 sm:gap-3 text-xl sm:text-2xl font-display font-medium lg:font-semibold text-gray-800 dark:text-gray-100">
+                      <div className="p-2 sm:p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl text-white shadow-lg">
+                        <DollarSign className="w-5 h-5 sm:w-6 sm:h-6" />
                       </div>
                       Tax Summary
                     </CardTitle>
                   </CardHeader>
                   
                   <CardContent>
-                    <div className="grid md:grid-cols-3 gap-6">
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 auto-rows-fr">
                       {[
                         {
                           label: "Effective Income",
@@ -506,60 +516,63 @@ export function TaxCalculator() {
                           initial={{ opacity: 0, y: 30, scale: 0.9 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           transition={{ duration: 0.5, delay: index * 0.1 }}
+                          className="h-full"
                         >
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Card className="p-6 hover:shadow-xl transition-all duration-300 cursor-help border border-gray-200 hover:border-gray-300 group relative overflow-hidden">
+                              <Card className="p-4 sm:p-6 hover:shadow-xl transition-all duration-300 cursor-help border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 group relative overflow-hidden bg-white dark:bg-gray-800 h-full flex flex-col">
                                 <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
                                 
-                                <div className="relative z-10">
-                                  <div className="flex items-center gap-3 mb-4">
-                                    <div className={`p-2 bg-gradient-to-br ${item.gradient} rounded-lg text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                                      <span className="text-lg font-bold">{item.icon}</span>
+                                <div className="relative z-10 flex flex-col h-full">
+                                  <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                                    <div className={`p-1.5 sm:p-2 bg-gradient-to-br ${item.gradient} rounded-lg text-white shadow-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}>
+                                      <span className="text-base sm:text-lg font-normal">{item.icon}</span>
                                     </div>
-                                    <p className="text-sm font-bold text-gray-600 uppercase tracking-wide">{item.label}</p>
+                                    <p className="text-xs sm:text-sm font-normal text-gray-600 dark:text-gray-400 uppercase tracking-wide line-clamp-2">{item.label}</p>
                                   </div>
                                   
-                                  <p className="text-3xl font-black text-gray-900 mb-2 group-hover:scale-105 transition-transform duration-300">
+                                  <p className="text-lg sm:text-xl lg:text-2xl font-display font-medium lg:font-semibold text-gray-900 dark:text-gray-100 mb-2 group-hover:scale-105 transition-transform duration-300 flex-grow flex items-center">
                                     {item.value}
                                   </p>
                                   
-                                  {item.efficiency && (
-                                    <p className={`text-sm font-medium mb-2 ${
-                                      results.effectiveTaxRate <= 10 ? 'text-green-600' :
-                                      results.effectiveTaxRate <= 20 ? 'text-blue-600' :
-                                      results.effectiveTaxRate <= 30 ? 'text-yellow-600' :
-                                      'text-orange-600'
-                                    }`}>
-                                      {item.efficiency}
-                                    </p>
-                                  )}
-                                  
-                                  {item.progress !== undefined && (
-                                    <div className="mt-3">
-                                      <Progress 
-                                        value={Math.min(item.progress, 40)} 
-                                        className="h-3 bg-gray-200" 
-                                      />
-                                    </div>
-                                  )}
-                                  
-                                  {item.showSavings && (
-                                    <motion.div
-                                      initial={{ opacity: 0, scale: 0.8 }}
-                                      animate={{ opacity: 1, scale: 1 }}
-                                      transition={{ delay: 0.5 }}
-                                    >
-                                      <Badge variant="secondary" className="mt-3 bg-green-100 text-green-800 border-green-300 font-medium">
-                                        <Target className="w-3 h-3 mr-1" />
-                                        Excellent tax efficiency!
-                                      </Badge>
-                                    </motion.div>
-                                  )}
+                                  <div className="mt-auto space-y-2">
+                                    {item.efficiency && (
+                                      <p className={`text-xs sm:text-sm font-normal mb-2 ${
+                                        results.effectiveTaxRate <= 10 ? 'text-green-600 dark:text-green-400' :
+                                        results.effectiveTaxRate <= 20 ? 'text-blue-600 dark:text-blue-400' :
+                                        results.effectiveTaxRate <= 30 ? 'text-yellow-600 dark:text-yellow-400' :
+                                        'text-orange-600 dark:text-orange-400'
+                                      }`}>
+                                        {item.efficiency}
+                                      </p>
+                                    )}
+                                    
+                                    {item.progress !== undefined && (
+                                      <div>
+                                        <Progress 
+                                          value={Math.min(item.progress, 40)} 
+                                          className="h-2 sm:h-3 bg-gray-200 dark:bg-gray-700" 
+                                        />
+                                      </div>
+                                    )}
+                                    
+                                    {item.showSavings && (
+                                      <motion.div
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ delay: 0.5 }}
+                                      >
+                                        <Badge variant="secondary" className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 border-green-300 dark:border-green-600 font-normal text-xs sm:text-sm">
+                                          <Target className="w-3 h-3 mr-1" />
+                                          Excellent tax efficiency!
+                                        </Badge>
+                                      </motion.div>
+                                    )}
+                                  </div>
                                 </div>
                               </Card>
                             </TooltipTrigger>
-                            <TooltipContent side="bottom" className="bg-gray-800 text-white border-gray-700">
+                            <TooltipContent side="bottom" className="bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-800 border-gray-700 dark:border-gray-300">
                               <p className="font-medium">{item.tooltip}</p>
                             </TooltipContent>
                           </Tooltip>
@@ -570,19 +583,19 @@ export function TaxCalculator() {
                 </Card>
 
                 {/* Tax Breakdown */}
-                <Card className="shadow-2xl border-0 bg-white/95 backdrop-blur-xl ring-1 ring-gray-200/50 overflow-hidden">
+                <Card className="shadow-2xl border-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl ring-1 ring-gray-200/50 dark:ring-gray-700/50 overflow-hidden">
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500" />
                   
-                  <CardHeader className="pb-6">
-                    <CardTitle className="flex items-center gap-3 text-3xl font-bold text-gray-800">
-                      <div className="p-3 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl text-white shadow-lg">
-                        <PieChart className="w-8 h-8" />
+                  <CardHeader className="pb-4 sm:pb-6">
+                    <CardTitle className="flex items-center gap-2 sm:gap-3 text-xl sm:text-2xl font-display font-medium lg:font-semibold text-gray-800 dark:text-gray-100">
+                      <div className="p-2 sm:p-3 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl text-white shadow-lg">
+                        <PieChart className="w-5 h-5 sm:w-6 sm:h-6" />
                       </div>
                       Detailed Tax Breakdown
                     </CardTitle>
                   </CardHeader>
                   
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-3 sm:space-y-4">
                     {[
                       { label: "Gross Income", value: results.effectiveIncome, isPositive: true, icon: "💼" },
                       { label: "Less: Standard Deduction", value: -results.standardDeduction, isDeduction: true, icon: "💰" },
@@ -599,56 +612,56 @@ export function TaxCalculator() {
                         initial={{ opacity: 0, x: -30 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.4, delay: index * 0.05 }}
-                        className="flex justify-between items-center py-4 px-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50 rounded-lg transition-all duration-200 group"
+                        className="flex justify-between items-center py-3 sm:py-4 px-3 sm:px-4 border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 rounded-lg transition-all duration-200 group"
                       >
-                        <div className="flex items-center gap-3">
-                          <span className="text-lg group-hover:scale-110 transition-transform duration-200">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <span className="text-base sm:text-lg group-hover:scale-110 transition-transform duration-200">
                             {item.icon}
                           </span>
-                          <span className="text-gray-700 font-semibold">{item.label}</span>
+                          <span className="text-sm sm:text-base text-gray-700 dark:text-gray-300 font-normal">{item.label}</span>
                         </div>
-                        <span className={`font-bold text-xl ${
-                          item.isDeduction ? 'text-green-600' : 'text-gray-900'
+                        <span className={`font-normal md:font-medium text-base sm:text-lg lg:text-xl ${
+                          item.isDeduction ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-gray-100'
                         } group-hover:scale-105 transition-transform duration-200`}>
                           {formatCurrency(Math.abs(item.value))}
                         </span>
                       </motion.div>
                     ))}
                     
-                    <Separator className="my-6" />
+                    <Separator className="my-4 sm:my-6 dark:bg-gray-700" />
                     
                     <motion.div
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.5, delay: 0.8 }}
-                      className="flex justify-between items-center py-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl px-6 border-2 border-blue-200 shadow-lg"
+                      className="flex justify-between items-center py-4 sm:py-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl px-4 sm:px-6 border-2 border-blue-200 dark:border-blue-700 shadow-lg"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg text-white">
-                          <Target className="w-5 h-5" />
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="p-1.5 sm:p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg text-white">
+                          <Target className="w-4 h-4 sm:w-5 sm:h-5" />
                         </div>
-                        <span className="text-2xl font-black text-gray-900">Total Tax Payable</span>
+                        <span className="text-lg sm:text-xl font-display font-medium lg:font-semibold text-gray-900 dark:text-gray-100">Total Tax Payable</span>
                       </div>
-                      <span className="text-3xl font-black text-blue-600">{formatCurrency(results.totalTax)}</span>
+                      <span className="text-xl sm:text-2xl font-display font-medium lg:font-semibold text-blue-600 dark:text-blue-400">{formatCurrency(results.totalTax)}</span>
                     </motion.div>
 
                     {/* Tax Slabs Breakdown */}
-                    <div className="mt-8 pt-6 border-t border-gray-200">
-                      <h4 className="text-2xl font-bold mb-6 text-gray-800 flex items-center gap-2">
-                        <span className="text-2xl">🎯</span>
+                    <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
+                      <h4 className="text-lg sm:text-xl font-display font-normal md:font-medium mb-4 sm:mb-6 text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                        <span className="text-lg sm:text-xl">🎯</span>
                         Tax Slab Calculation Details
                       </h4>
-                      <div className="space-y-4">
+                      <div className="space-y-3 sm:space-y-4">
                         {results.slabDetails.map((slab, index) => (
                           <motion.div
                             key={index}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.4, delay: index * 0.1 }}
-                            className={`p-5 rounded-xl border-2 transition-all duration-300 relative overflow-hidden ${
+                            className={`p-4 sm:p-5 rounded-xl border-2 transition-all duration-300 relative overflow-hidden ${
                               slab.active 
-                                ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300 shadow-lg hover:shadow-xl' 
-                                : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                                ? 'bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-300 dark:border-green-600 shadow-lg hover:shadow-xl' 
+                                : 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800'
                             }`}
                           >
                             {slab.active && (
@@ -656,21 +669,21 @@ export function TaxCalculator() {
                             )}
                             
                             <div className="flex justify-between items-center">
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-2 sm:gap-3">
                                 {slab.active && (
                                   <motion.div
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
                                     transition={{ delay: index * 0.1 + 0.2 }}
                                   >
-                                    <CheckCircle className="w-5 h-5 text-green-600" />
+                                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 dark:text-green-400" />
                                   </motion.div>
                                 )}
-                                <span className={`font-bold text-lg ${slab.active ? 'text-green-800' : 'text-gray-600'}`}>
+                                <span className={`font-normal md:font-medium text-sm sm:text-base lg:text-lg ${slab.active ? 'text-green-800 dark:text-green-300' : 'text-gray-600 dark:text-gray-400'}`}>
                                   {slab.range} @ {slab.rate}
                                 </span>
                               </div>
-                              <span className={`font-black text-xl ${slab.active ? 'text-green-800' : 'text-gray-600'}`}>
+                              <span className={`font-normal md:font-medium text-base sm:text-lg lg:text-xl ${slab.active ? 'text-green-800 dark:text-green-300' : 'text-gray-600 dark:text-gray-400'}`}>
                                 {formatCurrency(slab.tax)}
                               </span>
                             </div>
@@ -695,9 +708,9 @@ export function TaxCalculator() {
               whileHover={{ scale: 1.1, y: -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={scrollToTop}
-              className="fixed bottom-8 right-8 w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full shadow-xl hover:shadow-2xl flex items-center justify-center transition-all duration-300 z-50 group"
+              className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 dark:from-blue-500 dark:to-indigo-500 dark:hover:from-blue-600 dark:hover:to-indigo-600 text-white rounded-full shadow-xl hover:shadow-2xl flex items-center justify-center transition-all duration-300 z-50 group"
             >
-              <ArrowUp className="w-6 h-6 group-hover:-translate-y-0.5 transition-transform duration-200" />
+              <ArrowUp className="w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-y-0.5 transition-transform duration-200" />
             </motion.button>
           )}
         </AnimatePresence>

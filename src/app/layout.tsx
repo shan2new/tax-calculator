@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/lib/theme-context";
 import "./globals.css";
 
 const inter = Inter({
@@ -68,15 +69,17 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       </head>
-      <body className="font-inter antialiased bg-gradient-to-br from-blue-50 via-white to-blue-50">
-        {children}
-        <Toaster 
-          position="top-right"
-          closeButton={true}
-          richColors={true}
-          duration={4000}
-        />
-        <Analytics />
+      <body className="font-inter antialiased bg-background text-foreground">
+        <ThemeProvider>
+          {children}
+          <Toaster 
+            position="top-right"
+            closeButton={true}
+            richColors={true}
+            duration={4000}
+          />
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   );

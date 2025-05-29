@@ -20,12 +20,12 @@ export function DeveloperFooter() {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.2 }}
-      className="mt-20 bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 text-white relative overflow-hidden"
+      className="mt-20 bg-gradient-to-br from-gray-900 via-slate-900 to-gray-900 dark:from-black dark:via-gray-900 dark:to-black text-white relative overflow-hidden"
     >
       {/* Enhanced Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-900/10 via-purple-900/10 to-green-900/10 pointer-events-none" />
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-900/10 via-purple-900/10 to-green-900/10 dark:from-blue-800/5 dark:via-purple-800/5 dark:to-green-800/5 pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/5 dark:bg-blue-400/3 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 dark:bg-purple-400/3 rounded-full blur-3xl" />
       
       {/* Animated particles */}
       <div className="absolute inset-0 overflow-hidden">
