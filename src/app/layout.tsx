@@ -84,14 +84,14 @@ export default function RootLayout({
         <ThemeProvider>
           <NavigationProvider>
             <Navbar />
-            {children}
-            <Toaster 
-              position="top-right"
-              closeButton={true}
-              richColors={true}
-              duration={4000}
-            />
-            <Analytics />
+          {children}
+          <Toaster 
+            position="top-right"
+            closeButton={true}
+            richColors={true}
+            duration={4000}
+          />
+          <Analytics />
           </NavigationProvider>
         </ThemeProvider>
       </body>

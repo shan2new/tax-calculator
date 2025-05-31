@@ -66,15 +66,17 @@ const Checkbox = ({
       aria-checked={checked}
       onClick={() => onCheckedChange?.(!checked)}
       className={cn(
-        "flex items-center space-x-2 text-sm cursor-pointer hover:bg-accent/50 rounded-md p-2 transition-colors",
+        "flex items-center space-x-2 text-sm cursor-pointer hover:bg-accent rounded-md p-2 transition-colors",
         className
       )}
       {...props}
     >
       <div
         className={cn(
-          "h-4 w-4 rounded border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-          checked ? "bg-primary text-primary-foreground" : "bg-background"
+          "h-4 w-4 rounded border ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+          checked 
+            ? "bg-primary text-primary-foreground border-primary" 
+            : "bg-background border-input hover:border-ring"
         )}
       >
         {checked && (
@@ -104,9 +106,9 @@ const SelectionButton = ({
       type="button"
       onClick={onSelect}
       className={cn(
-        "w-full text-left p-3 rounded-lg border-2 transition-all hover:bg-accent/50",
+        "w-full text-left p-3 rounded-lg border-2 transition-all hover:bg-accent",
         selected 
-          ? "border-primary bg-primary/5 text-primary" 
+          ? "border-primary bg-primary/10 text-primary" 
           : "border-border hover:border-primary/50",
         className
       )}
@@ -359,27 +361,27 @@ export function SmartDeductionsWizard({ deductions, onDeductionsChange, grossInc
           </TooltipTrigger>
           <TooltipContent 
             side="top" 
-            className="max-w-sm p-4 bg-white dark:bg-gray-900 border shadow-lg"
+            className="max-w-sm p-4 bg-popover border shadow-lg"
             sideOffset={8}
           >
             <div className="space-y-3">
               <div>
-                <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100">{content.title}</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{content.description}</p>
+                <h4 className="font-semibold text-sm text-popover-foreground">{content.title}</h4>
+                <p className="text-sm text-muted-foreground mt-1">{content.description}</p>
               </div>
               <div>
-                <p className="font-medium text-sm mb-2 text-gray-900 dark:text-gray-100">Examples:</p>
+                <p className="font-medium text-sm mb-2 text-popover-foreground">Examples:</p>
                 <ul className="text-sm space-y-1">
                   {content.examples.map((example, index) => (
                     <li key={index} className="flex items-start gap-2">
                       <span className="text-primary font-bold mt-0.5 text-base">•</span>
-                      <span className="text-gray-700 dark:text-gray-300">{example}</span>
+                      <span className="text-muted-foreground">{example}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-md p-3">
-                <p className="text-sm font-medium text-blue-800 dark:text-blue-200">{content.note}</p>
+              <div className="bg-primary/10 border border-primary/20 rounded-md p-3">
+                <p className="text-sm font-medium text-primary">{content.note}</p>
               </div>
             </div>
           </TooltipContent>
@@ -411,8 +413,8 @@ export function SmartDeductionsWizard({ deductions, onDeductionsChange, grossInc
             >
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Users className="w-5 h-5 text-blue-600" />
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Users className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-sm">Simple Employee</h3>
@@ -441,8 +443,8 @@ export function SmartDeductionsWizard({ deductions, onDeductionsChange, grossInc
             >
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <TrendingUp className="w-5 h-5 text-green-600" />
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <TrendingUp className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-sm">Active Investor</h3>
@@ -471,8 +473,8 @@ export function SmartDeductionsWizard({ deductions, onDeductionsChange, grossInc
             >
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
-                  <div className="p-2 bg-orange-100 rounded-lg">
-                    <Home className="w-5 h-5 text-orange-600" />
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Home className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-sm">Paying Rent</h3>
@@ -501,8 +503,8 @@ export function SmartDeductionsWizard({ deductions, onDeductionsChange, grossInc
             >
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <Calculator className="w-5 h-5 text-purple-600" />
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Calculator className="w-5 h-5 text-primary" />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-sm">Home Owner</h3>
@@ -572,6 +574,7 @@ export function SmartDeductionsWizard({ deductions, onDeductionsChange, grossInc
               return (
                 <button
                   key={step.id}
+                  type="button"
                   onClick={() => goToStep(step.id)}
                   className="flex flex-col items-center cursor-pointer group transition-all hover:scale-105"
                   aria-label={`Go to ${step.label} step`}
@@ -887,7 +890,7 @@ export function SmartDeductionsWizard({ deductions, onDeductionsChange, grossInc
             <Card className="p-4">
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <GraduationCap className="w-5 h-5 text-blue-600" />
+                  <GraduationCap className="w-5 h-5 text-primary" />
                   <LabelWithTooltip tooltipKey="section80E">
                     <h4 className="font-medium">Education Loan Interest (80E)</h4>
                   </LabelWithTooltip>
@@ -913,7 +916,7 @@ export function SmartDeductionsWizard({ deductions, onDeductionsChange, grossInc
             <Card className="p-4">
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <Heart className="w-5 h-5 text-red-600" />
+                  <Heart className="w-5 h-5 text-primary" />
                   <LabelWithTooltip tooltipKey="section80G">
                     <h4 className="font-medium">Charitable Donations (80G)</h4>
                   </LabelWithTooltip>
@@ -939,7 +942,7 @@ export function SmartDeductionsWizard({ deductions, onDeductionsChange, grossInc
             <Card className="p-4">
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <PiggyBank className="w-5 h-5 text-green-600" />
+                  <PiggyBank className="w-5 h-5 text-primary" />
                   <LabelWithTooltip tooltipKey="section80TTA">
                     <h4 className="font-medium">Savings Account Interest (80TTA)</h4>
                   </LabelWithTooltip>
@@ -1021,7 +1024,7 @@ export function SmartDeductionsWizard({ deductions, onDeductionsChange, grossInc
                   savings: Math.round(Math.min(tempDeductions.section80TTA, 10000) * 0.208)
                 }
               ].filter(item => item.amount > 0).map((item, index) => (
-                <div key={index} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                <div key={index} className="flex justify-between items-center p-3 bg-muted/30 rounded-lg">
                   <div>
                     <span className="font-medium text-sm">{item.label}</span>
                     <p className="text-xs text-muted-foreground">₹{formatIndianNumber(item.amount)}</p>

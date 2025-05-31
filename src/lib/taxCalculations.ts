@@ -70,6 +70,30 @@ export interface TaxRegimeComparison {
   reasonsOld: string[];
 }
 
+export interface IncomePeriod {
+  id: string;
+  startMonth: number; // 1-12 (April=1, March=12)
+  endMonth: number; // 1-12
+  grossIncome: number; // Monthly income for this period
+  description?: string; // Optional description like "Job at Company A"
+}
+
+export interface MultiPeriodTaxInputs {
+  incomePeriods: IncomePeriod[];
+  regime: 'new' | 'old';
+  oldRegimeDeductions?: OldTaxRegimeInputs;
+}
+
+export interface MultiPeriodTaxResult extends TaxResult {
+  totalMonthsWorked: number;
+  incomePeriods: IncomePeriod[];
+  periodBreakdown: {
+    period: IncomePeriod;
+    income: number;
+    monthsInPeriod: number;
+  }[];
+}
+
 // New Tax Regime Slabs for FY 2025-26
 const TAX_SLABS: TaxSlab[] = [
   { min: 0, max: 400000, rate: 0 },
@@ -382,4 +406,159 @@ export function compareRegimes(
       "Suitable for high deduction investors"
     ]
   };
+}
+
+// Multi-period calculation functions
+
+export function validateIncomePeriods(periods: IncomePeriod[]): {
+  isValid: boolean;
+  message: string;
+  errors: string[];
+} {
+  const errors: string[] = [];
+  
+  if (periods.length === 0) {
+    errors.push("At least one income period is required");
+  }
+  
+  // Check for overlapping periods
+  for (let i = 0; i < periods.length; i++) {
+    const period = periods[i];
+    
+    if (period.startMonth > period.endMonth) {
+      errors.push(`Period ${i + 1}: Start month cannot be after end month`);
+    }
+    
+    if (period.grossIncome <= 0) {
+      errors.push(`Period ${i + 1}: Income must be greater than 0`);
+    }
+    
+    // Check for overlaps with other periods
+    for (let j = i + 1; j < periods.length; j++) {
+      const otherPeriod = periods[j];
+      if (periodsOverlap(period, otherPeriod)) {
+        errors.push(`Period ${i + 1} overlaps with Period ${j + 1}`);
+      }
+    }
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    message: errors.length === 0 ? "Valid income periods" : "Invalid income periods",
+    errors
+  };
+}
+
+function periodsOverlap(period1: IncomePeriod, period2: IncomePeriod): boolean {
+  return period1.startMonth <= period2.endMonth && period2.startMonth <= period1.endMonth;
+}
+
+function getMonthsInPeriod(startMonth: number, endMonth: number): number {
+  if (startMonth <= endMonth) {
+    return endMonth - startMonth + 1;
+  } else {
+    // Handle cross-year periods (e.g., March to April next year)
+    return (12 - startMonth + 1) + endMonth;
+  }
+}
+
+export function calculateMultiPeriodTax(
+  incomePeriods: IncomePeriod[],
+  regime: 'new' | 'old' = 'new',
+  oldRegimeDeductions?: OldTaxRegimeInputs
+): MultiPeriodTaxResult {
+  const validation = validateIncomePeriods(incomePeriods);
+  if (!validation.isValid) {
+    throw new Error(`Invalid income periods: ${validation.errors.join(', ')}`);
+  }
+  
+  // Calculate total income and months worked
+  let totalIncome = 0;
+  let totalMonthsWorked = 0;
+  const periodBreakdown: MultiPeriodTaxResult['periodBreakdown'] = [];
+  
+  for (const period of incomePeriods) {
+    const monthsInPeriod = getMonthsInPeriod(period.startMonth, period.endMonth);
+    const periodIncome = period.grossIncome * monthsInPeriod;
+    
+    totalIncome += periodIncome;
+    totalMonthsWorked += monthsInPeriod;
+    
+    periodBreakdown.push({
+      period,
+      income: periodIncome,
+      monthsInPeriod
+    });
+  }
+  
+  // Convert total income to annual equivalent for tax calculation
+  const annualEquivalentIncome = totalIncome;
+  
+  // Calculate tax based on regime
+  let baseResult: TaxResult;
+  if (regime === 'new') {
+    baseResult = calculateTax(annualEquivalentIncome, totalMonthsWorked);
+  } else {
+    if (!oldRegimeDeductions) {
+      throw new Error("Old regime deductions are required for old tax regime calculation");
+    }
+    baseResult = calculateOldTaxRegime(annualEquivalentIncome, totalMonthsWorked, oldRegimeDeductions);
+  }
+  
+  return {
+    ...baseResult,
+    totalMonthsWorked,
+    incomePeriods,
+    periodBreakdown
+  };
+}
+
+export function compareMultiPeriodRegimes(
+  incomePeriods: IncomePeriod[],
+  oldRegimeDeductions: OldTaxRegimeInputs
+): TaxRegimeComparison {
+  const newRegimeResult = calculateMultiPeriodTax(incomePeriods, 'new');
+  const oldRegimeResult = calculateMultiPeriodTax(incomePeriods, 'old', oldRegimeDeductions);
+  
+  const savings = Math.abs(newRegimeResult.totalTax - oldRegimeResult.totalTax);
+  const recommendation = newRegimeResult.totalTax <= oldRegimeResult.totalTax ? 'new' : 'old';
+  
+  return {
+    newRegime: newRegimeResult,
+    oldRegime: oldRegimeResult,
+    recommendation,
+    savings,
+    reasonsNew: [
+      "No documentation required for deductions",
+      "Higher standard deduction (₹75,000)",
+      "Simplified tax calculation",
+      "Lower tax rates in middle income brackets"
+    ],
+    reasonsOld: [
+      "Multiple deduction options available",
+      "HRA, 80C, 80D benefits",
+      "Home loan interest deduction",
+      "Suitable for high deduction investors"
+    ]
+  };
+}
+
+// Helper function to get month name from month number (1=April, 12=March)
+export function getMonthName(month: number): string {
+  const months = [
+    'April', 'May', 'June', 'July', 'August', 'September',
+    'October', 'November', 'December', 'January', 'February', 'March'
+  ];
+  return months[month - 1] || 'Invalid';
+}
+
+// Helper function to create a simple income period for backward compatibility
+export function createSimpleIncomePeriod(grossIncome: number, monthsWorked: number): IncomePeriod[] {
+  return [{
+    id: 'simple-period',
+    startMonth: 1, // April
+    endMonth: monthsWorked,
+    grossIncome: grossIncome / monthsWorked, // Convert annual to monthly
+    description: `${monthsWorked} months of work`
+  }];
 } 

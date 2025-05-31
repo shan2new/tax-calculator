@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode } from "react";
 
-export type Page = "calculator" | "comparison" | "regimes" | "guide" | "help" | "about";
+export type Page = "hero" | "calculator" | "comparison" | "regimes" | "guide" | "help" | "about";
 
 interface NavigationContextType {
   currentPage: Page;
@@ -12,7 +12,7 @@ interface NavigationContextType {
 const NavigationContext = createContext<NavigationContextType | undefined>(undefined);
 
 export function NavigationProvider({ children }: { children: ReactNode }) {
-  const [currentPage, setCurrentPage] = useState<Page>("calculator");
+  const [currentPage, setCurrentPage] = useState<Page>("hero");
 
   return (
     <NavigationContext.Provider value={{ currentPage, setCurrentPage }}>
