@@ -41,10 +41,10 @@ import {
 } from "@/lib/formatters";
 import confetti from "canvas-confetti";
 import { TaxRegimeSelector, type TaxRegime } from "@/components/TaxRegimeSelector";
-import { OldTaxRegimeForm } from "@/components/OldTaxRegimeForm";
 import { SalaryComparison } from "@/components/SalaryComparison";
 import { About } from "@/components/About";
 import { useNavigation } from "@/lib/navigation-context";
+import { SmartDeductionsWizard } from "@/components/SmartDeductionsWizard";
 
 const formSchema = z.object({
   grossIncome: z.string().min(1, "Income is required"),
@@ -146,7 +146,9 @@ export function TaxCalculator() {
       if (selectedRegime === 'new') {
         taxResult = calculateTax(income, data.monthsWorked);
       } else {
-        taxResult = calculateOldTaxRegime(income, data.monthsWorked, oldRegimeDeductions);
+        // Get current deductions at time of calculation
+        const currentDeductions = oldRegimeDeductions;
+        taxResult = calculateOldTaxRegime(income, data.monthsWorked, currentDeductions);
       }
       
       setResults(taxResult);
@@ -199,7 +201,7 @@ export function TaxCalculator() {
     } finally {
       setIsCalculating(false);
     }
-  }, [selectedRegime, oldRegimeDeductions]);
+  }, [selectedRegime]);
 
   const handleCompareRegimes = useCallback(async () => {
     const grossIncome = form.getValues("grossIncome");
@@ -219,7 +221,9 @@ export function TaxCalculator() {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     try {
-      const comparison = compareRegimes(income, monthsWorked, oldRegimeDeductions);
+      // Get current deductions at time of calculation
+      const currentDeductions = oldRegimeDeductions;
+      const comparison = compareRegimes(income, monthsWorked, currentDeductions);
       setComparisonResults(comparison);
       setShowComparison(true);
       
@@ -239,7 +243,15 @@ export function TaxCalculator() {
     } finally {
       setIsCalculating(false);
     }
-  }, [oldRegimeDeductions, form]);
+  }, [form]);
+
+  // Memoize deductions change handler to prevent unnecessary re-renders
+  const handleDeductionsChange = useCallback((newDeductions: OldTaxRegimeInputs) => {
+    setOldRegimeDeductions(newDeductions);
+    // Clear results when deductions change to avoid showing stale data
+    setShowResults(false);
+    setShowComparison(false);
+  }, []);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -575,9 +587,9 @@ export function TaxCalculator() {
                       {/* Old Tax Regime Deductions Form */}
                       {selectedRegime === 'old' && (
                         <div className="space-y-4">
-                          <OldTaxRegimeForm
+                          <SmartDeductionsWizard
                             deductions={oldRegimeDeductions}
-                            onDeductionsChange={setOldRegimeDeductions}
+                            onDeductionsChange={handleDeductionsChange}
                             grossIncome={parseIndianNumber(grossIncomeValue)}
                           />
                         </div>
