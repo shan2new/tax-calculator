@@ -1,3 +1,5 @@
+import { formatCurrency } from './formatters';
+
 export interface TaxSlab {
   min: number;
   max: number;
@@ -38,6 +40,34 @@ export interface TaxResult {
   afterTaxMonthly: number;
   effectiveTaxRate: number;
   slabDetails: SlabDetail[];
+  totalDeductions?: number;
+  hraExemption?: number;
+  section80CDeduction?: number;
+  section80DDeduction?: number;
+  homeLoanDeduction?: number;
+}
+
+export interface OldTaxRegimeInputs {
+  section80C: number;
+  section80D: number;
+  hraReceived: number;
+  rentPaid: number;
+  isMetroCity: boolean;
+  homeLoanInterest: number;
+  section80E: number;
+  section80G: number;
+  section80EE: number;
+  section80EEA: number;
+  section80TTA: number;
+}
+
+export interface TaxRegimeComparison {
+  newRegime: TaxResult;
+  oldRegime: TaxResult;
+  recommendation: 'new' | 'old';
+  savings: number;
+  reasonsNew: string[];
+  reasonsOld: string[];
 }
 
 // New Tax Regime Slabs for FY 2025-26
@@ -49,6 +79,14 @@ const TAX_SLABS: TaxSlab[] = [
   { min: 1600000, max: 2000000, rate: 0.20 },
   { min: 2000000, max: 2400000, rate: 0.25 },
   { min: 2400000, max: Infinity, rate: 0.30 }
+];
+
+// Old Tax Regime Slabs for FY 2025-26
+const OLD_TAX_SLABS = [
+  { min: 0, max: 250000, rate: 0 },
+  { min: 250000, max: 500000, rate: 5 },
+  { min: 500000, max: 1000000, rate: 20 },
+  { min: 1000000, max: Infinity, rate: 30 }
 ];
 
 export function calculateBasicTax(income: number): TaxCalculationResult {
@@ -153,20 +191,17 @@ export function calculateTax(grossIncome: number, monthsWorked: number = 12): Ta
   const taxAfterRebate = basicTax - rebate;
   
   // Calculate surcharge
-  const surchargeCalc = calculateSurcharge(taxableIncome, taxAfterRebate);
-  const surcharge = surchargeCalc.surcharge;
-  const surchargeRate = surchargeCalc.rate;
-  
-  // Calculate total before cess
-  const totalBeforeCess = taxAfterRebate + surcharge;
+  const surchargeResult = calculateSurcharge(taxAfterRebate, taxableIncome);
+  const surcharge = surchargeResult.surcharge;
+  const surchargeRate = surchargeResult.rate;
   
   // Calculate Health & Education Cess (4%)
-  const cess = totalBeforeCess * 0.04;
-  const totalTaxBeforeRelief = totalBeforeCess + cess;
+  const cess = (taxAfterRebate + surcharge) * 0.04;
+  const totalTaxBeforeMarginalRelief = taxAfterRebate + surcharge + cess;
   
   // Calculate marginal relief
-  const marginalRelief = calculateMarginalRelief(taxableIncome, totalTaxBeforeRelief);
-  const totalTax = totalTaxBeforeRelief - marginalRelief;
+  const marginalRelief = calculateMarginalRelief(taxableIncome, totalTaxBeforeMarginalRelief);
+  const totalTax = totalTaxBeforeMarginalRelief - marginalRelief;
   
   // Calculate after-tax amounts
   const afterTaxAnnual = effectiveIncome - totalTax;
@@ -191,5 +226,160 @@ export function calculateTax(grossIncome: number, monthsWorked: number = 12): Ta
     afterTaxMonthly,
     effectiveTaxRate,
     slabDetails
+  };
+}
+
+export function calculateOldTaxRegime(
+  grossIncome: number, 
+  monthsWorked: number = 12,
+  deductions: OldTaxRegimeInputs
+): TaxResult {
+  const effectiveIncome = (grossIncome * monthsWorked) / 12;
+  
+  // Standard Deduction (Old Regime has lower amount)
+  const standardDeduction = 50000;
+  
+  // Calculate HRA Exemption
+  const hraExemption = calculateHRAExemption(
+    effectiveIncome,
+    deductions.hraReceived,
+    deductions.rentPaid,
+    deductions.isMetroCity
+  );
+  
+  // Calculate total deductions
+  const section80CDeduction = Math.min(deductions.section80C, 150000);
+  const section80DDeduction = Math.min(deductions.section80D, 25000); // Basic limit
+  const homeLoanDeduction = Math.min(deductions.homeLoanInterest, 200000);
+  
+  const totalDeductions = standardDeduction + 
+                         hraExemption + 
+                         section80CDeduction + 
+                         section80DDeduction + 
+                         homeLoanDeduction +
+                         deductions.section80E +
+                         deductions.section80G +
+                         deductions.section80EE +
+                         deductions.section80EEA +
+                         Math.min(deductions.section80TTA, 10000);
+  
+  const taxableIncome = Math.max(0, effectiveIncome - totalDeductions);
+  
+  // Calculate basic tax using old slabs
+  let basicTax = 0;
+  for (const slab of OLD_TAX_SLABS) {
+    if (taxableIncome > slab.min) {
+      const taxableInThisSlab = Math.min(taxableIncome, slab.max) - slab.min;
+      basicTax += (taxableInThisSlab * slab.rate) / 100;
+    }
+  }
+  
+  // Rebate under section 87A (same as new regime)
+  const rebate = taxableIncome <= 500000 ? Math.min(basicTax, 12500) : 0;
+  const taxAfterRebate = Math.max(0, basicTax - rebate);
+  
+  // Surcharge calculation (same logic as new regime)
+  const surchargeResultOld = calculateSurcharge(taxAfterRebate, taxableIncome);
+  const surcharge = surchargeResultOld.surcharge;
+  const surchargeRate = surchargeResultOld.rate;
+  
+  // Calculate marginal relief
+  const marginalReliefOld = calculateMarginalRelief(taxableIncome, taxAfterRebate + surcharge);
+  
+  // Health and Education Cess
+  const cess = (taxAfterRebate + surcharge - marginalReliefOld) * 0.04;
+  
+  const totalTax = taxAfterRebate + surcharge - marginalReliefOld + cess;
+  
+  return {
+    effectiveIncome,
+    standardDeduction,
+    taxableIncome,
+    basicTax,
+    rebate,
+    taxAfterRebate,
+    surcharge,
+    surchargeRate,
+    marginalRelief: marginalReliefOld,
+    cess,
+    totalTax,
+    afterTaxAnnual: effectiveIncome - totalTax,
+    afterTaxMonthly: (effectiveIncome - totalTax) / monthsWorked,
+    effectiveTaxRate: effectiveIncome > 0 ? (totalTax / effectiveIncome) * 100 : 0,
+    slabDetails: generateOldSlabDetails(taxableIncome),
+    totalDeductions,
+    hraExemption,
+    section80CDeduction,
+    section80DDeduction,
+    homeLoanDeduction
+  };
+}
+
+function calculateHRAExemption(
+  basicSalary: number,
+  hraReceived: number,
+  rentPaid: number,
+  isMetroCity: boolean
+): number {
+  if (hraReceived === 0 || rentPaid === 0) return 0;
+  
+  const hraPercent = isMetroCity ? 0.5 : 0.4;
+  const exemptionOptions = [
+    hraReceived,
+    basicSalary * hraPercent,
+    Math.max(0, rentPaid - (basicSalary * 0.1))
+  ];
+  
+  return Math.min(...exemptionOptions);
+}
+
+function generateOldSlabDetails(taxableIncome: number) {
+  return OLD_TAX_SLABS.map(slab => {
+    const isActive = taxableIncome > slab.min;
+    const taxableInThisSlab = isActive 
+      ? Math.min(taxableIncome, slab.max) - slab.min 
+      : 0;
+    const tax = (taxableInThisSlab * slab.rate) / 100;
+    
+    const maxDisplay = slab.max === Infinity ? "Above" : formatCurrency(slab.max);
+    
+    return {
+      range: `${formatCurrency(slab.min)} - ${maxDisplay}`,
+      rate: `${slab.rate}%`,
+      tax,
+      taxable: taxableInThisSlab,
+      active: isActive && tax > 0
+    };
+  });
+}
+
+export function compareRegimes(
+  grossIncome: number,
+  monthsWorked: number,
+  oldRegimeDeductions: OldTaxRegimeInputs
+): TaxRegimeComparison {
+  const newRegime = calculateTax(grossIncome, monthsWorked);
+  const oldRegime = calculateOldTaxRegime(grossIncome, monthsWorked, oldRegimeDeductions);
+  
+  const savings = Math.abs(newRegime.totalTax - oldRegime.totalTax);
+  const recommendation = newRegime.totalTax <= oldRegime.totalTax ? 'new' : 'old';
+  
+  return {
+    newRegime,
+    oldRegime,
+    recommendation,
+    savings,
+    reasonsNew: [
+      "No documentation required for deductions",
+      "Higher standard deduction (₹75,000)",
+      "Simplified tax calculation",
+      "Lower tax rates in middle income brackets"
+    ],
+    reasonsOld: [
+      "Multiple deduction options available",
+      "HRA, 80C, 80D benefits",
+      "Home loan interest deduction",
+      "Suitable for high deduction investors"
+    ]
   };
 } 

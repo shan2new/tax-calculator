@@ -3,6 +3,8 @@ import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/lib/theme-context";
+import { NavigationProvider } from "@/lib/navigation-context";
+import { Navbar } from "@/components/Navbar";
 import "./globals.css";
 
 const inter = Inter({
@@ -18,9 +20,10 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Indian Tax Calculator FY 2025-26 - New Tax Regime | Free Income Tax Calculator",
-  description: "Free Indian Income Tax Calculator for FY 2025-26 under New Tax Regime. Calculate your tax liability, tax savings, and take-home salary instantly. Updated with latest tax slabs and rates.",
+  title: "Calcq - Indian Tax Calculator FY 2025-26 | Free Income Tax Calculator",
+  description: "Calcq: Free Indian Income Tax Calculator for FY 2025-26 under New Tax Regime. Calculate your tax liability, tax savings, and take-home salary instantly. Updated with latest tax slabs and rates.",
   keywords: [
+    "calcq",
     "indian tax calculator",
     "income tax calculator india", 
     "tax calculator FY 2025-26",
@@ -36,17 +39,22 @@ export const metadata: Metadata = {
   creator: "shan2new",
   publisher: "shan2new",
   robots: "index, follow",
+  metadataBase: new URL("https://calcq.tech"),
+  alternates: {
+    canonical: "https://calcq.tech",
+  },
   openGraph: {
     type: "website",
-    title: "Indian Tax Calculator FY 2025-26 - New Tax Regime",
-    description: "Free Indian Income Tax Calculator for FY 2025-26. Calculate your tax liability and take-home salary under the New Tax Regime instantly.",
-    siteName: "Indian Tax Calculator",
+    url: "https://calcq.tech",
+    title: "Calcq - Indian Tax Calculator FY 2025-26",
+    description: "Calcq: Free Indian Income Tax Calculator for FY 2025-26. Calculate your tax liability and take-home salary under the New Tax Regime instantly.",
+    siteName: "Calcq",
     locale: "en_IN",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Indian Tax Calculator FY 2025-26 - New Tax Regime",
-    description: "Free Indian Income Tax Calculator for FY 2025-26. Calculate your tax liability and take-home salary under the New Tax Regime instantly.",
+    title: "Calcq - Indian Tax Calculator FY 2025-26",
+    description: "Calcq: Free Indian Income Tax Calculator for FY 2025-26. Calculate your tax liability and take-home salary under the New Tax Regime instantly.",
   },
   other: {
     "theme-color": "#2563EB",
@@ -68,17 +76,23 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+        <link rel="icon" href="/logo.svg" sizes="32x32" />
+        <link rel="apple-touch-icon" href="/logo.svg" />
       </head>
       <body className="font-inter antialiased bg-background text-foreground">
         <ThemeProvider>
-          {children}
-          <Toaster 
-            position="top-right"
-            closeButton={true}
-            richColors={true}
-            duration={4000}
-          />
-          <Analytics />
+          <NavigationProvider>
+            <Navbar />
+            {children}
+            <Toaster 
+              position="top-right"
+              closeButton={true}
+              richColors={true}
+              duration={4000}
+            />
+            <Analytics />
+          </NavigationProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -23,7 +23,7 @@
 
 ## 🚀 Live Demo
 
-[**View Live Application →**](https://your-deployed-url.vercel.app)
+[**View Live Application →**](https://calcq.tech/)
 
 ## 🏗️ Built With
 
