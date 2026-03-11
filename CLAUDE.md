@@ -91,6 +91,11 @@ src/styles/           tokens + keyframes
 - Tenure: sensitivity `0.25`, tick `1`
 - Gross income: sensitivity `2`, tick `500000`
 - Deductions: sensitivity `1`, tick `50000`
+- Scrub gestures: horizontal intent only; keep vertical page scroll intact until scrub is committed
+- Scrub bounds: ease near edges; momentum stays subtle and should not fire at limits or tiny ranges
+- Scrub response: use a step-aware baseline; accelerate only after deliberate horizontal travel
+- Scrub display: animate visible value toward target, but keep derived outputs in step with committed ticks
+- Money scrubs: compact at rest, full INR precision while dragging
 
 ## Haptics (Current Wiring)
 
@@ -103,7 +108,7 @@ src/styles/           tokens + keyframes
 1. Never read computed styles inside canvas animation loops.
 2. Always cancel `requestAnimationFrame` on cleanup.
 3. `Ring` must re-init on `size` changes.
-4. `SmoothNumber` remains rAF-based (0.12 interpolation), not CSS digit-roll.
+4. `SmoothNumber` remains rAF-based with adaptive catch-up; no scale pulse, not CSS digit-roll.
 5. Keep per-frame work lightweight (particle/ember count discipline).
 
 ## New Module Checklist

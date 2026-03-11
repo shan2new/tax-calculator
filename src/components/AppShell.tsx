@@ -7,7 +7,7 @@ import { Particles } from "@/components/Particles";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { WelcomeOverlay } from "@/screens/Welcome";
 
-function Shell({ children }: { children: ReactNode }) {
+function Shell({ children }: Readonly<{ children: ReactNode }>) {
   const { dark, toggle } = useTheme();
   const pathname = usePathname();
   const isHome = pathname === "/";
@@ -37,7 +37,7 @@ function Shell({ children }: { children: ReactNode }) {
         position: "relative",
         WebkitFontSmoothing: "antialiased",
         transition:
-          "background 0.7s cubic-bezier(0.16,1,0.3,1), color 0.7s cubic-bezier(0.16,1,0.3,1)",
+          "background var(--motion-theme) var(--ease-premium), color var(--motion-theme) var(--ease-premium)",
       }}
     >
       <Particles intensity={0.4} dark={dark} />
@@ -56,18 +56,33 @@ function Shell({ children }: { children: ReactNode }) {
           zIndex: 1,
         }}
       >
-        <div key={pathname} className="nav-in">
+        <div
+          key={pathname}
+          className="nav-in"
+          style={{
+            transformOrigin: isHome ? "center top" : "center 24px",
+            willChange: "transform, opacity",
+          }}
+        >
           {children}
         </div>
 
-        <div style={{ textAlign: "center", paddingTop: 36 }}>
+        <div
+          style={{
+            textAlign: "center",
+            paddingTop: 36,
+            opacity: welcomed ? 1 : 0.4,
+            transform: welcomed ? "translateY(0)" : "translateY(4px)",
+            transition: "opacity var(--motion-slow) var(--ease-premium), transform var(--motion-slow) var(--ease-premium)",
+          }}
+        >
           <span
             style={{
               fontSize: 9,
               color: "var(--text-muted-faint)",
               letterSpacing: "0.25em",
               textTransform: "uppercase",
-              transition: "color 0.7s",
+              transition: "color var(--motion-theme) var(--ease-premium)",
             }}
           >
             Claros

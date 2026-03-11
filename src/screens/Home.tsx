@@ -6,6 +6,7 @@ import { MiniRing } from "@/components/MiniRing";
 import { MiniTaxViz } from "@/components/MiniTaxViz";
 import { PressableCard } from "@/components/PressableCard";
 import { Haptic } from "@/hooks/useHaptic";
+import { usePremiumPress } from "@/hooks/usePremiumPress";
 
 interface HomeScreenProps {
   dark: boolean;
@@ -20,8 +21,9 @@ function getGreeting(): string {
   return "Good evening";
 }
 
-export function HomeScreen({ dark }: HomeScreenProps) {
+export function HomeScreen({ dark }: Readonly<HomeScreenProps>) {
   const router = useRouter();
+  const legalPress = usePremiumPress();
   const modules = [
     { id: "/loans", title: "Loans", desc: "See what your money really costs", viz: <MiniRing dark={dark} /> },
     { id: "/tax", title: "Income Tax", desc: "Old vs New — find what saves more", viz: <MiniTaxViz dark={dark} /> },
@@ -95,42 +97,76 @@ export function HomeScreen({ dark }: HomeScreenProps) {
             }}
             delay={idx * 120 + 300}
           >
-            <div style={{ position: "relative", flexShrink: 0 }}>{m.viz}</div>
-            <div style={{ position: "relative", flex: 1 }}>
-              <div
-                style={{
-                  fontSize: 18,
-                  fontWeight: 300,
-                  color: "var(--text-primary)",
-                  letterSpacing: "-0.01em",
-                  marginBottom: 5,
-                }}
-              >
-                {m.title}
-              </div>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "var(--text-muted)",
-                  letterSpacing: "0.01em",
-                  lineHeight: 1.4,
-                }}
-              >
-                {m.desc}
-              </div>
-            </div>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="var(--text-muted-faint)"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              style={{ position: "relative", flexShrink: 0 }}
-            >
-              <path d="M9 18l6-6-6-6" />
-            </svg>
+            {({ pressed, hovered }) => (
+              <>
+                <div
+                  style={{
+                    position: "relative",
+                    flexShrink: 0,
+                    transform: pressed
+                      ? "translateX(-2px) scale(0.985)"
+                      : hovered
+                        ? "translateX(2px) scale(1.02)"
+                        : "translateX(0) scale(1)",
+                    transition: "transform var(--motion-slow) var(--ease-premium)",
+                  }}
+                >
+                  {m.viz}
+                </div>
+                <div
+                  style={{
+                    position: "relative",
+                    flex: 1,
+                    transform: pressed ? "translateY(1px)" : hovered ? "translateY(-1px)" : "translateY(0)",
+                    transition: "transform var(--motion-medium) var(--ease-premium)",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 18,
+                      fontWeight: 300,
+                      color: "var(--text-primary)",
+                      letterSpacing: "-0.01em",
+                      marginBottom: 5,
+                    }}
+                  >
+                    {m.title}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 12,
+                      color: "var(--text-muted)",
+                      letterSpacing: "0.01em",
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {m.desc}
+                  </div>
+                </div>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="var(--text-muted-faint)"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  style={{
+                    position: "relative",
+                    flexShrink: 0,
+                    transform: pressed
+                      ? "translateX(1px) scale(0.96)"
+                      : hovered
+                        ? "translateX(4px)"
+                        : "translateX(0)",
+                    opacity: hovered || pressed ? 1 : 0.82,
+                    transition: "transform var(--motion-medium) var(--ease-premium), opacity var(--motion-medium) var(--ease-premium)",
+                  }}
+                >
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </>
+            )}
           </PressableCard>
         ))}
       </div>
@@ -147,6 +183,7 @@ export function HomeScreen({ dark }: HomeScreenProps) {
         }}
       >
         <button
+          {...legalPress.bind}
           onClick={() => {
             Haptic.light();
             router.push("/legal");
@@ -161,6 +198,14 @@ export function HomeScreen({ dark }: HomeScreenProps) {
             fontFamily: "inherit",
             padding: "8px 12px",
             marginBottom: 4,
+            opacity: legalPress.pressed ? 0.78 : 1,
+            transform: legalPress.pressed
+              ? "translateY(1px) scale(0.97)"
+              : legalPress.hovered
+                ? "translateY(-1px)"
+                : "translateY(0)",
+            transition:
+              "color var(--motion-medium) var(--ease-premium), opacity var(--motion-medium) var(--ease-premium), transform var(--motion-medium) var(--ease-premium)",
           }}
         >
           About & Legal

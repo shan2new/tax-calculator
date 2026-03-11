@@ -3,8 +3,8 @@
 }
 
 @keyframes hintFade {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: translateY(6px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @keyframes homeIn {
@@ -13,13 +13,13 @@
 }
 
 @keyframes legalIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: none; }
+  from { opacity: 0; transform: translateY(10px) scale(0.992); filter: blur(6px); }
+  to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 }
 
 @keyframes navIn {
-  from { opacity: 0; transform: translateX(8px); }
-  to { opacity: 1; transform: none; }
+  from { opacity: 0; transform: translateY(8px) scale(0.992); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .nav-out {
@@ -30,4 +30,15 @@
 
 .nav-in {
   animation: navIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes badgeFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+@keyframes softSheen {
+  from { transform: translateX(-120%); opacity: 0; }
+  40% { opacity: 0.24; }
+  to { transform: translateX(120%); opacity: 0; }
 }

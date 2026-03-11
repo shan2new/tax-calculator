@@ -88,16 +88,21 @@ light: ringRGB [80,68,52],    warnRGB [168,72,40],   particleRGB [120,100,80]
 - Keyframes in use: `homeIn`, `legalIn`, `navIn`, `rip`, `hintFade`
 - Theme transitions: around 700ms for color/background/border/shadow
 - Press feedback: scale to around `0.97`
-- Numeric smoothing: rAF interpolation (`SmoothNumber`, factor 0.12)
+- Numeric smoothing: rAF interpolation with adaptive catch-up; avoid decorative scale pulses on live amounts
 
 ## Interaction Contracts
 
 ### ScrubValue
 
 - Enter scrub at movement >5px
-- Delta formula: `(dx / (window.innerWidth * 0.5)) * range * sensitivity`
+- Vertical scroll wins until horizontal intent is clear; use `touch-action: pan-y`
+- Delta formula should be step-aware, not dominated by full control range
+- Small drags favor precision; larger swipes earn acceleration gradually instead of staying fully linear
+- Visible control value should glide toward the target with rAF smoothing, while derived outputs keep up with committed ticks
+- Money controls stay compact at rest and reveal full INR precision while actively scrubbing
+- Ease movement near min/max bounds; avoid hard-stop feel during drag
 - Tick crossing: pulse + light haptic + optional tick callback
-- Release velocity >3: momentum coast (`v *= 0.93`)
+- Momentum is subtle, time-based, and suppressed at bounds / short ranges
 - Tap behavior: switch to text input
 - Amount input supports commas + `L`/`Cr` parsing
 

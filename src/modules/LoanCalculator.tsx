@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, type MouseEvent, type ReactNode } from "react";
 import { Ring } from "@/components/Ring";
 import { SmoothNumber } from "@/components/SmoothNumber";
 import { ScrubValue } from "@/components/ScrubValue";
 import { Haptic } from "@/hooks/useHaptic";
-import { fINR, fShort } from "@/lib/format";
+import { usePremiumPress } from "@/hooks/usePremiumPress";
+import { fINR, fShort, fShortStep } from "@/lib/format";
 import { LOAN_TYPES, emiCalc } from "@/lib/calc";
 
 interface PinnedState {
@@ -22,7 +23,99 @@ interface LoanModuleProps {
   dark: boolean;
 }
 
-export function LoanModule({ dark }: LoanModuleProps) {
+function LoanTypeTab({
+  active,
+  label,
+  onClick,
+}: Readonly<{
+  active: boolean;
+  label: string;
+  onClick: () => void;
+}>) {
+  const press = usePremiumPress();
+
+  return (
+    <button
+      {...press.bind}
+      onClick={onClick}
+      style={{
+        background: "transparent",
+        border: "none",
+        color: active ? "var(--tab-active)" : "var(--tab-inactive)",
+        fontSize: 12,
+        fontWeight: active ? 400 : 300,
+        letterSpacing: "0.05em",
+        padding: "8px 14px",
+        cursor: "pointer",
+        fontFamily: "inherit",
+        position: "relative",
+        transform: press.pressed ? "translateY(1px) scale(0.96)" : press.hovered ? "translateY(-1px)" : "translateY(0)",
+        transition:
+          "color var(--motion-medium) var(--ease-premium), transform var(--motion-medium) var(--ease-premium), opacity var(--motion-medium) var(--ease-premium)",
+      }}
+    >
+      {label}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: "50%",
+          transform: `translateX(-50%) scaleX(${active ? 1 : press.hovered ? 0.55 : 0.2})`,
+          transformOrigin: "center",
+          width: 20,
+          height: 1,
+          background: "var(--tab-line)",
+          opacity: active ? 1 : press.hovered ? 0.75 : 0.2,
+          transition:
+            "transform var(--motion-slow) var(--ease-premium), opacity var(--motion-medium) var(--ease-premium), background var(--motion-medium) var(--ease-premium)",
+        }}
+      />
+    </button>
+  );
+}
+
+function ActionIconButton({
+  active = false,
+  onClick,
+  children,
+}: Readonly<{
+  active?: boolean;
+  onClick: (ev: MouseEvent<HTMLButtonElement>) => void;
+  children: ReactNode;
+}>) {
+  const press = usePremiumPress();
+
+  return (
+    <button
+      {...press.bind}
+      onClick={onClick}
+      style={{
+        background: "transparent",
+        border: "none",
+        cursor: "pointer",
+        color: active ? "var(--warn)" : "var(--text-muted-faint)",
+        padding: 8,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        transition:
+          "color var(--motion-medium) var(--ease-premium), transform var(--motion-medium) var(--ease-premium), opacity var(--motion-medium) var(--ease-premium)",
+        transform: press.pressed
+          ? "translateY(1px) scale(0.92)"
+          : active
+            ? "scale(1.08)"
+            : press.hovered
+              ? "scale(1.04)"
+              : "scale(1)",
+        opacity: press.pressed ? 0.84 : 1,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+export function LoanModule({ dark }: Readonly<LoanModuleProps>) {
   const [ti, setTi] = useState(0);
   const t = LOAN_TYPES[ti];
   const [amount, setAmount] = useState(t.amt);
@@ -33,6 +126,8 @@ export function LoanModule({ dark }: LoanModuleProps) {
   const fireTick = useCallback(() => setTickSig(Date.now()), []);
   const [amortOpen, setAmortOpen] = useState(false);
   const [ringView, setRingView] = useState(0);
+  const [displayRingView, setDisplayRingView] = useState(0);
+  const [ringContentVisible, setRingContentVisible] = useState(true);
 
   // Comparison mode
   const [comparing, setComparing] = useState(false);
@@ -57,6 +152,21 @@ export function LoanModule({ dark }: LoanModuleProps) {
     Haptic.light();
     setRingView((v) => (v + 1) % 3);
   };
+
+  useEffect(() => {
+    if (comparing) {
+      setDisplayRingView(ringView);
+      setRingContentVisible(true);
+      return;
+    }
+    if (displayRingView === ringView) return;
+    setRingContentVisible(false);
+    const swapTimer = globalThis.setTimeout(() => {
+      setDisplayRingView(ringView);
+      setRingContentVisible(true);
+    }, 110);
+    return () => globalThis.clearTimeout(swapTimer);
+  }, [comparing, displayRingView, ringView]);
 
   const e = emiCalc(amount, rate, tenure);
   const total = e * tenure * 12;
@@ -265,37 +375,7 @@ export function LoanModule({ dark }: LoanModuleProps) {
       {/* Sub-nav */}
       <div style={{ display: "flex", justifyContent: "center", padding: "8px 0 24px" }}>
         {LOAN_TYPES.map((tp, i) => (
-          <button
-            key={tp.id}
-            onClick={() => switchType(i)}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: i === ti ? "var(--tab-active)" : "var(--tab-inactive)",
-              fontSize: 12,
-              fontWeight: i === ti ? 400 : 300,
-              letterSpacing: "0.05em",
-              padding: "8px 14px",
-              cursor: "pointer",
-              fontFamily: "inherit",
-              position: "relative",
-              transition: "color 0.4s",
-            }}
-          >
-            {tp.label}
-            <div
-              style={{
-                position: "absolute",
-                bottom: 0,
-                left: "50%",
-                transform: "translateX(-50%)",
-                width: i === ti ? 20 : 0,
-                height: 1,
-                background: "var(--tab-line)",
-                transition: "width 0.5s cubic-bezier(0.16,1,0.3,1)",
-              }}
-            />
-          </button>
+          <LoanTypeTab key={tp.id} label={tp.label} active={i === ti} onClick={() => switchType(i)} />
         ))}
       </div>
 
@@ -306,7 +386,7 @@ export function LoanModule({ dark }: LoanModuleProps) {
           justifyContent: "center",
           alignItems: "center",
           gap: comparing ? 12 : 0,
-          transition: "gap 0.6s cubic-bezier(0.16,1,0.3,1)",
+          transition: "gap var(--motion-slow) var(--ease-premium)",
           minHeight: comparing ? 180 : 260,
           marginBottom: 4,
         }}
@@ -317,8 +397,9 @@ export function LoanModule({ dark }: LoanModuleProps) {
             flex: comparing ? "1 1 0" : "0 0 0",
             maxWidth: comparing ? 170 : 0,
             opacity: comparing ? 1 : 0,
-            transform: comparing ? "scale(1)" : "scale(0.7)",
-            transition: "all 0.6s cubic-bezier(0.16,1,0.3,1)",
+            transform: comparing ? "translateX(0) scale(1)" : "translateX(16px) scale(0.7)",
+            transition:
+              "max-width var(--motion-slow) var(--ease-premium), opacity var(--motion-medium) var(--ease-premium), transform var(--motion-slow) var(--ease-premium), flex-basis var(--motion-slow) var(--ease-premium)",
             overflow: "hidden",
           }}
         >
@@ -390,7 +471,8 @@ export function LoanModule({ dark }: LoanModuleProps) {
             maxWidth: comparing ? 170 : 260,
             display: "flex",
             justifyContent: "center",
-            transition: "all 0.6s cubic-bezier(0.16,1,0.3,1)",
+            transition:
+              "max-width var(--motion-slow) var(--ease-premium), flex-basis var(--motion-slow) var(--ease-premium)",
           }}
         >
           <div
@@ -399,7 +481,7 @@ export function LoanModule({ dark }: LoanModuleProps) {
               width: comparing ? 140 : 260,
               height: comparing ? 140 : 260,
               transition:
-                "width 0.6s cubic-bezier(0.16,1,0.3,1), height 0.6s cubic-bezier(0.16,1,0.3,1)",
+                "width var(--motion-slow) var(--ease-premium), height var(--motion-slow) var(--ease-premium)",
             }}
           >
             <Ring
@@ -407,11 +489,20 @@ export function LoanModule({ dark }: LoanModuleProps) {
               velocity={vel}
               tickSignal={tickSig}
               dark={dark}
-              pinnedIR={null}
+              pinnedIR={comparing && pinned ? pinned.ir : null}
               size={comparing ? 140 : 260}
             />
             <div
               onClick={comparing ? undefined : cycleRingView}
+              onKeyDown={(e) => {
+                if (comparing) return;
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  cycleRingView();
+                }
+              }}
+              role={comparing ? undefined : "button"}
+              tabIndex={comparing ? -1 : 0}
               style={{
                 position: "absolute",
                 inset: 0,
@@ -459,8 +550,28 @@ export function LoanModule({ dark }: LoanModuleProps) {
                   </span>
                 </>
               ) : (
-                <>
-                  {ringView === 0 && (
+                <div
+                  style={{
+                    minHeight: 98,
+                    minWidth: 164,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      opacity: ringContentVisible ? 1 : 0,
+                      transform: ringContentVisible ? "translateY(0) scale(1)" : "translateY(8px) scale(0.985)",
+                      transition:
+                        "opacity var(--motion-medium) var(--ease-premium), transform var(--motion-slow) var(--ease-premium)",
+                    }}
+                  >
+                  {displayRingView === 0 && (
                     <>
                       <span
                         style={{
@@ -479,16 +590,15 @@ export function LoanModule({ dark }: LoanModuleProps) {
                           fontSize: 11,
                           color: ir > 0.5 ? "var(--warn)" : "var(--text-muted-faint)",
                           marginTop: 8,
-                          transition: "color 0.5s",
+                          transition: "color var(--motion-medium) var(--ease-premium)",
                         }}
                       >
                         {Math.round(ir * 100)}% goes to interest
                       </span>
                     </>
                   )}
-                  {ringView === 1 && (
-                    <>
-                      <div style={{ display: "flex", gap: 24, alignItems: "flex-end" }}>
+                  {displayRingView === 1 && (
+                    <div style={{ display: "flex", gap: 24, alignItems: "flex-end" }}>
                         <div style={{ textAlign: "center" }}>
                           <div
                             style={{
@@ -547,9 +657,8 @@ export function LoanModule({ dark }: LoanModuleProps) {
                           </div>
                         </div>
                       </div>
-                    </>
                   )}
-                  {ringView === 2 && (
+                  {displayRingView === 2 && (
                     <>
                       <span
                         style={{
@@ -574,7 +683,8 @@ export function LoanModule({ dark }: LoanModuleProps) {
                       </span>
                     </>
                   )}
-                </>
+                  </div>
+                </div>
               )}
             </div>
           </div>
@@ -592,12 +702,18 @@ export function LoanModule({ dark }: LoanModuleProps) {
         >
           <span
             style={{
+              display: "inline-block",
               fontSize: 14,
               fontWeight: 300,
               fontFamily: "var(--font)",
               color: delta.emi > 0 ? "var(--warn)" : "var(--text-positive)",
               fontVariantNumeric: "tabular-nums",
               letterSpacing: "-0.02em",
+              transform: "translateY(0) scale(1)",
+              padding: "4px 10px",
+              borderRadius: 999,
+              background: "var(--card-bg)",
+              border: "1px solid var(--border)",
             }}
           >
             {delta.emi > 0 ? "+" : ""}
@@ -620,22 +736,11 @@ export function LoanModule({ dark }: LoanModuleProps) {
           padding: "4px 0 4px",
         }}
       >
-        <button
+        <ActionIconButton
+          active={comparing}
           onClick={(ev) => {
             ev.stopPropagation();
             if (comparing) clearCompare(); else pinCurrent();
-          }}
-          style={{
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
-            color: comparing ? "var(--warn)" : "var(--text-muted-faint)",
-            padding: 8,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            transition: "color 0.3s, transform 0.3s cubic-bezier(0.16,1,0.3,1)",
-            transform: comparing ? "scale(1.1)" : "scale(1)",
           }}
         >
           {comparing ? (
@@ -667,71 +772,66 @@ export function LoanModule({ dark }: LoanModuleProps) {
               <path d="M16 15h5" />
             </svg>
           )}
-        </button>
+        </ActionIconButton>
         {!comparing && (
           <div style={{ display: "flex", gap: 6 }}>
             {[0, 1, 2].map((i) => (
               <div
                 key={i}
                 style={{
-                  width: i === ringView ? 8 : 4,
+                  width: i === ringView ? 10 : 4,
                   height: 4,
                   borderRadius: 2,
                   background:
                     i === ringView ? "var(--text-muted-mid)" : "var(--text-muted-faint)",
-                  transition: "all 0.3s cubic-bezier(0.16,1,0.3,1)",
+                  opacity: i === ringView ? 1 : 0.72,
+                  transform: i === ringView ? "scaleX(1)" : "scaleX(0.92)",
+                  transition:
+                    "width var(--motion-medium) var(--ease-premium), background var(--motion-medium) var(--ease-premium), opacity var(--motion-medium) var(--ease-premium), transform var(--motion-medium) var(--ease-premium)",
                 }}
               />
             ))}
           </div>
         )}
-        <button
+        <ActionIconButton
           onClick={(ev) => {
             ev.stopPropagation();
             generateShareCard();
           }}
-          style={{
-            background: "transparent",
-            border: "none",
-            cursor: "pointer",
-            color: shareVisible ? "var(--text-muted-mid)" : "var(--text-muted-faint)",
-            padding: 8,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            position: "relative",
-          }}
+          active={shareVisible}
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          >
-            <path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7" />
-            <polyline points="16 6 12 2 8 6" />
-            <line x1="12" y1="2" x2="12" y2="15" />
-          </svg>
-          {shareVisible && (
-            <div
-              style={{
-                position: "absolute",
-                bottom: -20,
-                left: "50%",
-                transform: "translateX(-50%)",
-                fontSize: 9,
-                color: "var(--text-muted-mid)",
-                whiteSpace: "nowrap",
-                animation: "hintFade 0.2s ease",
-              }}
+          <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
             >
-              Copied
-            </div>
-          )}
-        </button>
+              <path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7" />
+              <polyline points="16 6 12 2 8 6" />
+              <line x1="12" y1="2" x2="12" y2="15" />
+            </svg>
+            {shareVisible && (
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: -20,
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  fontSize: 9,
+                  color: "var(--text-muted-mid)",
+                  whiteSpace: "nowrap",
+                  animation: "hintFade 0.2s ease",
+                }}
+              >
+                Copied
+              </div>
+            )}
+          </div>
+        </ActionIconButton>
       </div>
 
       {/* Controls */}
@@ -743,7 +843,8 @@ export function LoanModule({ dark }: LoanModuleProps) {
           max={t.maxAmt}
           step={t.step}
           sensitivity={1.8}
-          format={fShort}
+          format={(v) => fShortStep(v, t.step)}
+          scrubFormat={fINR}
           onVelocity={setVel}
           isAmount
           onChange={setAmount}
@@ -759,7 +860,7 @@ export function LoanModule({ dark }: LoanModuleProps) {
           sensitivity={0.35}
           format={(v) => `${v.toFixed(1)}%`}
           onVelocity={setVel}
-          parseInput={(s) => parseFloat(s.replace(/%/g, ""))}
+          parseInput={(s) => Number.parseFloat(s.replaceAll("%", ""))}
           onChange={setRate}
           tickStep={1}
           onTick={fireTick}
@@ -773,7 +874,7 @@ export function LoanModule({ dark }: LoanModuleProps) {
           sensitivity={0.25}
           format={(v) => `${v} ${v === 1 ? "yr" : "yrs"}`}
           onVelocity={setVel}
-          parseInput={(s) => parseInt(s)}
+          parseInput={(s) => Number.parseInt(s, 10)}
           onChange={setTenure}
           tickStep={1}
           onTick={fireTick}
@@ -788,6 +889,15 @@ export function LoanModule({ dark }: LoanModuleProps) {
               setAmortOpen(!amortOpen);
               Haptic.light();
             }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setAmortOpen((v) => !v);
+                Haptic.light();
+              }
+            }}
+            role="button"
+            tabIndex={0}
             style={{
               display: "flex",
               alignItems: "center",
@@ -812,7 +922,7 @@ export function LoanModule({ dark }: LoanModuleProps) {
                 fontSize: 12,
                 color: "var(--text-muted-faint)",
                 transform: amortOpen ? "rotate(180deg)" : "none",
-                transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1)",
+              transition: "transform var(--motion-slow) var(--ease-premium), color var(--motion-medium) var(--ease-premium)",
                 display: "inline-block",
               }}
             >
@@ -823,7 +933,8 @@ export function LoanModule({ dark }: LoanModuleProps) {
             style={{
               maxHeight: amortOpen ? 2000 : 0,
               overflow: "hidden",
-              transition: "max-height 0.5s cubic-bezier(0.16,1,0.3,1)",
+            transition: "max-height var(--motion-slow) var(--ease-premium), opacity var(--motion-medium) var(--ease-premium)",
+            opacity: amortOpen ? 1 : 0.72,
             }}
           >
             <div style={{ display: "flex", flexDirection: "column", gap: 3, paddingBottom: 16 }}>
@@ -869,6 +980,9 @@ export function LoanModule({ dark }: LoanModuleProps) {
                             borderRadius: 3,
                             overflow: "hidden",
                             display: "flex",
+                            transform: isCross ? "scaleY(1.16)" : "scaleY(1)",
+                            transition:
+                              "width var(--motion-slow) var(--ease-premium), transform var(--motion-medium) var(--ease-premium)",
                           }}
                         >
                           <div
@@ -876,6 +990,7 @@ export function LoanModule({ dark }: LoanModuleProps) {
                               width: `${pPct}%`,
                               background: "var(--bar-fill)",
                               height: "100%",
+                              transition: "width var(--motion-slow) var(--ease-premium)",
                             }}
                           />
                           <div

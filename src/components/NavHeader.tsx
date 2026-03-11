@@ -2,13 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import { Haptic } from "@/hooks/useHaptic";
+import { usePremiumPress } from "@/hooks/usePremiumPress";
 
 interface NavHeaderProps {
   title: string;
 }
 
-export function NavHeader({ title }: NavHeaderProps) {
+export function NavHeader({ title }: Readonly<NavHeaderProps>) {
   const router = useRouter();
+  const backPress = usePremiumPress();
   return (
     <div
       style={{
@@ -20,6 +22,7 @@ export function NavHeader({ title }: NavHeaderProps) {
       }}
     >
       <button
+        {...backPress.bind}
         onClick={() => {
           Haptic.light();
           router.push("/");
@@ -32,6 +35,14 @@ export function NavHeader({ title }: NavHeaderProps) {
           display: "flex",
           alignItems: "center",
           color: "var(--text-muted-mid)",
+          opacity: backPress.pressed ? 0.8 : 1,
+          transform: backPress.pressed
+            ? "translateX(-1px) scale(0.94)"
+            : backPress.hovered
+              ? "translateX(-2px)"
+              : "translateX(0)",
+          transition:
+            "color var(--motion-medium) var(--ease-premium), transform var(--motion-medium) var(--ease-premium), opacity var(--motion-medium) var(--ease-premium)",
         }}
       >
         <svg
@@ -52,6 +63,7 @@ export function NavHeader({ title }: NavHeaderProps) {
           fontWeight: 300,
           color: "var(--text-primary)",
           letterSpacing: "-0.01em",
+          transition: "color var(--motion-theme) var(--ease-premium)",
         }}
       >
         {title}

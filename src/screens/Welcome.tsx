@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { Haptic } from "@/hooks/useHaptic";
+import { usePremiumPress } from "@/hooks/usePremiumPress";
 
 interface WelcomeOverlayProps {
   onAccept: () => void;
 }
 
-export function WelcomeOverlay({ onAccept }: WelcomeOverlayProps) {
+export function WelcomeOverlay({ onAccept }: Readonly<WelcomeOverlayProps>) {
   const [visible, setVisible] = useState(false);
+  const continuePress = usePremiumPress();
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 300);
@@ -24,14 +26,17 @@ export function WelcomeOverlay({ onAccept }: WelcomeOverlayProps) {
   return (
     <>
       {/* Scrim */}
-      <div
+      <button
+        aria-label="Dismiss welcome"
         style={{
           position: "fixed",
           inset: 0,
           zIndex: 199,
           background: "rgba(0,0,0,0.4)",
           opacity: visible ? 1 : 0,
-          transition: "opacity 0.4s ease",
+          border: "none",
+          padding: 0,
+          transition: "opacity var(--motion-medium) var(--ease-premium)",
           pointerEvents: visible ? "auto" : "none",
         }}
         onClick={handleAccept}
@@ -50,8 +55,9 @@ export function WelcomeOverlay({ onAccept }: WelcomeOverlayProps) {
           padding: "28px 28px max(28px, env(safe-area-inset-bottom))",
           maxWidth: 480,
           margin: "0 auto",
-          transform: visible ? "translateY(0)" : "translateY(100%)",
-          transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1)",
+          transform: visible ? "translateY(0) scale(1)" : "translateY(100%) scale(0.985)",
+          transformOrigin: "bottom center",
+          transition: "transform var(--motion-slow) var(--ease-premium), background var(--motion-theme) var(--ease-premium)",
           boxShadow: "0 -4px 40px rgba(0,0,0,0.25)",
         }}
       >
@@ -63,6 +69,9 @@ export function WelcomeOverlay({ onAccept }: WelcomeOverlayProps) {
               height: 4,
               borderRadius: 2,
               background: "var(--text-muted-faint)",
+              opacity: visible ? 1 : 0.5,
+              transform: visible ? "scaleX(1)" : "scaleX(0.8)",
+              transition: "opacity var(--motion-medium) var(--ease-premium), transform var(--motion-slow) var(--ease-premium)",
             }}
           />
         </div>
@@ -80,6 +89,7 @@ export function WelcomeOverlay({ onAccept }: WelcomeOverlayProps) {
         </div>
 
         <button
+          {...continuePress.bind}
           onClick={handleAccept}
           style={{
             width: "100%",
@@ -93,16 +103,17 @@ export function WelcomeOverlay({ onAccept }: WelcomeOverlayProps) {
             letterSpacing: "0.02em",
             cursor: "pointer",
             fontFamily: "var(--font)",
-            transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1), opacity 0.3s",
-          }}
-          onPointerDown={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.transform = "scale(0.97)";
-          }}
-          onPointerUp={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)";
-          }}
-          onPointerLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)";
+            opacity: continuePress.pressed ? 0.92 : 1,
+            transform: continuePress.pressed
+              ? "translateY(1px) scale(0.982)"
+              : continuePress.hovered
+                ? "translateY(-1px) scale(1.005)"
+                : "translateY(0) scale(1)",
+            boxShadow: continuePress.pressed
+              ? "0 6px 18px rgba(0,0,0,0.16)"
+              : "0 12px 24px rgba(0,0,0,0.10)",
+            transition:
+              "transform var(--motion-medium) var(--ease-premium), opacity var(--motion-medium) var(--ease-premium), background var(--motion-theme) var(--ease-premium), color var(--motion-theme) var(--ease-premium), box-shadow var(--motion-medium) var(--ease-premium)",
           }}
         >
           Continue

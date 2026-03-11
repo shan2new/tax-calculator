@@ -1,3 +1,11 @@
+:root {
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-fast: 180ms;
+  --motion-medium: 320ms;
+  --motion-slow: 420ms;
+  --motion-theme: 700ms;
+}
+
 [data-theme="dark"] {
   --bg: #050505;
   --font: 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;

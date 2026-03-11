@@ -52,7 +52,7 @@ const sections = [
   },
 ];
 
-export function LegalScreen({ dark }: LegalScreenProps) {
+export function LegalScreen({ dark }: Readonly<LegalScreenProps>) {
   return (
     <div style={{ padding: "8px 0" }}>
       {/* Header */}
@@ -89,8 +89,23 @@ export function LegalScreen({ dark }: LegalScreenProps) {
             borderRadius: 20,
             border: "1px solid var(--border)",
             background: "var(--card-bg)",
+            position: "relative",
+            overflow: "hidden",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
+            animation: "badgeFloat 4.8s ease-in-out infinite",
           }}
         >
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent)",
+              animation: "softSheen 3.8s cubic-bezier(0.16,1,0.3,1) 1.2s infinite",
+              pointerEvents: "none",
+            }}
+          />
           <svg
             width="18"
             height="12"
@@ -132,6 +147,7 @@ export function LegalScreen({ dark }: LegalScreenProps) {
             borderTop: idx === 0 ? "none" : "1px solid var(--border)",
             opacity: 0,
             animation: `legalIn 0.5s cubic-bezier(0.16,1,0.3,1) ${200 + idx * 80}ms forwards`,
+            transformOrigin: "center top",
           }}
         >
           <div style={S.label}>{sec.label}</div>

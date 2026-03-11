@@ -1,26 +1,33 @@
 "use client";
 
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { type CSSProperties, type ReactNode } from "react";
+import { usePremiumPress } from "@/hooks/usePremiumPress";
+
+interface PressableCardRenderState {
+  pressed: boolean;
+  hovered: boolean;
+}
 
 interface PressableCardProps {
-  children: ReactNode;
+  children: ReactNode | ((state: PressableCardRenderState) => ReactNode);
   onClick: () => void;
   delay: number;
   style?: CSSProperties;
 }
 
-export function PressableCard({ children, onClick, delay, style: extraStyle }: PressableCardProps) {
-  const [pressed, setPressed] = useState(false);
+export function PressableCard({
+  children,
+  onClick,
+  delay,
+  style: extraStyle,
+}: Readonly<PressableCardProps>) {
+  const { pressed, hovered, bind } = usePremiumPress();
+  const childContent = typeof children === "function" ? children({ pressed, hovered }) : children;
 
   return (
     <button
-      onPointerDown={() => setPressed(true)}
-      onPointerUp={() => {
-        setPressed(false);
-        onClick();
-      }}
-      onPointerLeave={() => setPressed(false)}
-      onPointerCancel={() => setPressed(false)}
+      {...bind}
+      onClick={onClick}
       style={{
         background: "var(--home-card-bg)",
         border: "1px solid var(--border)",
@@ -36,11 +43,20 @@ export function PressableCard({ children, onClick, delay, style: extraStyle }: P
         animation: `homeIn 0.7s cubic-bezier(0.16,1,0.3,1) ${delay}ms forwards`,
         position: "relative",
         overflow: "hidden",
-        transform: pressed ? "scale(0.97)" : "scale(1)",
+        transform: pressed
+          ? "translateY(1px) scale(0.972)"
+          : hovered
+            ? "translateY(-1px) scale(1.003)"
+            : "translateY(0) scale(1)",
         transition: pressed
-          ? "transform 0.12s cubic-bezier(0.2, 0, 0.6, 1)"
-          : "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
-        boxShadow: pressed ? "var(--card-shadow-pressed)" : "var(--card-shadow)",
+          ? "transform var(--motion-fast) var(--ease-premium), box-shadow var(--motion-fast) var(--ease-premium), border-color var(--motion-fast) var(--ease-premium)"
+          : "transform var(--motion-slow) var(--ease-premium), box-shadow var(--motion-medium) var(--ease-premium), border-color var(--motion-medium) var(--ease-premium)",
+        boxShadow: pressed
+          ? "var(--card-shadow-pressed)"
+          : hovered
+            ? "0 10px 28px rgba(0,0,0,0.10)"
+            : "var(--card-shadow)",
+        borderColor: hovered ? "var(--border-accent)" : "var(--border)",
         width: "100%",
         ...extraStyle,
       }}
@@ -50,13 +66,20 @@ export function PressableCard({ children, onClick, delay, style: extraStyle }: P
           position: "absolute",
           inset: 0,
           borderRadius: 20,
-          background: "linear-gradient(135deg, var(--card-gradient-start), transparent 60%)",
-          opacity: pressed ? 0.5 : 1,
-          transition: "opacity 0.15s",
+          background:
+            "linear-gradient(135deg, var(--card-gradient-start), transparent 56%, rgba(255,255,255,0.02) 100%)",
+          opacity: pressed ? 0.42 : hovered ? 0.92 : 1,
+          transform: pressed
+            ? "translateY(3%) scale(0.985)"
+            : hovered
+              ? "translateY(-2%) scale(1.01)"
+              : "translateY(0) scale(1)",
+          transition:
+            "opacity var(--motion-medium) var(--ease-premium), transform var(--motion-slow) var(--ease-premium)",
           pointerEvents: "none",
         }}
       />
-      {children}
+      {childContent}
     </button>
   );
 }

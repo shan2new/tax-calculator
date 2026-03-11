@@ -1,14 +1,31 @@
 export const fINR = (n: number): string =>
   `₹${Math.round(n).toLocaleString("en-IN")}`;
 
+function getUnitPrecision(unit: number, step: number, maxDecimals: number): number {
+  if (step <= 0) return 0;
+  const precision = Math.ceil(Math.log10(unit / step));
+  if (!Number.isFinite(precision)) return 0;
+  return Math.max(0, Math.min(maxDecimals, precision));
+}
+
 export const fShort = (n: number): string => {
   if (n >= 1e7) return `₹${(n / 1e7).toFixed(n % 1e7 === 0 ? 0 : 1)} Cr`;
   if (n >= 1e5) return `₹${(n / 1e5).toFixed(n % 1e5 === 0 ? 0 : 1)} L`;
   return fINR(n);
 };
 
+export const fShortStep = (n: number, step: number): string => {
+  if (n >= 1e7) {
+    return `₹${(n / 1e7).toFixed(getUnitPrecision(1e7, step, 2))} Cr`;
+  }
+  if (n >= 1e5) {
+    return `₹${(n / 1e5).toFixed(getUnitPrecision(1e5, step, 1))} L`;
+  }
+  return fINR(n);
+};
+
 export const toINRCommas = (s: string): string => {
-  const d = s.replace(/[^0-9]/g, "");
+  const d = s.replaceAll(/\D/g, "");
   if (!d) return "";
   if (d.length <= 3) return d;
   let r = d.slice(-3);
@@ -22,16 +39,16 @@ export const toINRCommas = (s: string): string => {
 };
 
 export const parseINRInput = (s: string): number => {
-  const c = s.replace(/[₹,\s]/g, "").toLowerCase();
-  const n = parseFloat(c.replace(/[^0-9.]/g, ""));
-  if (isNaN(n)) return NaN;
+  const c = s.replaceAll(/[₹,\s]/g, "").toLowerCase();
+  const n = Number.parseFloat(c.replaceAll(/[^0-9.]/g, ""));
+  if (Number.isNaN(n)) return Number.NaN;
   if (c.includes("cr")) return n * 1e7;
   if (c.includes("l")) return n * 1e5;
   return n;
 };
 
 export const humanHint = (n: number): string => {
-  if (isNaN(n) || n === 0) return "";
+  if (Number.isNaN(n) || n === 0) return "";
   if (n >= 1e7) return `₹${(n / 1e7).toFixed(2)} Cr`;
   if (n >= 1e5) return `₹${(n / 1e5).toFixed(2)} L`;
   if (n >= 1000) return fINR(n);

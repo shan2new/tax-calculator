@@ -1,24 +1,35 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { SmoothNumber } from "@/components/SmoothNumber";
 import { ScrubValue } from "@/components/ScrubValue";
 import { Haptic } from "@/hooks/useHaptic";
-import { fINR, fShort } from "@/lib/format";
+import { usePremiumPress } from "@/hooks/usePremiumPress";
+import { fINR, fShort, fShortStep } from "@/lib/format";
 import { calcTaxNew, calcTaxOld, TAX_NEW } from "@/lib/calc";
 
 interface TaxModuleProps {
   dark?: boolean;
 }
 
-export function TaxModule({}: TaxModuleProps) {
+export function TaxModule({}: Readonly<TaxModuleProps>) {
   const [income, setIncome] = useState(1500000);
   const [deductions, setDeductions] = useState(200000);
-  const [, setVel] = useState(0);
-  const [, setTickSig] = useState(0);
-  const fireTick = useCallback(() => setTickSig(Date.now()), []);
+  const [vel, setVel] = useState(0);
+  const [tickPulse, setTickPulse] = useState(false);
+  const tickPulseTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const fireTick = useCallback(() => {
+    setTickPulse(true);
+    globalThis.clearTimeout(tickPulseTimeoutRef.current);
+    tickPulseTimeoutRef.current = globalThis.setTimeout(() => setTickPulse(false), 180);
+  }, []);
   const [heroView, setHeroView] = useState(0);
+  const [displayHeroView, setDisplayHeroView] = useState(0);
+  const [heroContentVisible, setHeroContentVisible] = useState(true);
   const [slabsOpen, setSlabsOpen] = useState(false);
+  const [verdictPulse, setVerdictPulse] = useState(false);
+  const heroPress = usePremiumPress();
+  const slabsPress = usePremiumPress();
 
   const taxNew = calcTaxNew(income);
   const taxOld = calcTaxOld(income, deductions);
@@ -37,6 +48,32 @@ export function TaxModule({}: TaxModuleProps) {
     setHeroView((v) => (v + 1) % 3);
   };
 
+  useEffect(() => {
+    if (displayHeroView === heroView) return;
+    setHeroContentVisible(false);
+    const swapTimer = globalThis.setTimeout(() => {
+      setDisplayHeroView(heroView);
+      setHeroContentVisible(true);
+    }, 110);
+    return () => globalThis.clearTimeout(swapTimer);
+  }, [displayHeroView, heroView]);
+
+  useEffect(() => {
+    setVerdictPulse(true);
+    const t = globalThis.setTimeout(() => setVerdictPulse(false), 240);
+    return () => globalThis.clearTimeout(t);
+  }, [betterRegime, savings]);
+
+  useEffect(
+    () => () => {
+      globalThis.clearTimeout(tickPulseTimeoutRef.current);
+    },
+    []
+  );
+
+  const scrubEnergy = Math.min(1, vel / 18);
+  const winnerScale = 1 + scrubEnergy * 0.08 + (verdictPulse || tickPulse ? 0.1 : 0);
+
   return (
     <div>
       <div style={{ textAlign: "center", padding: "8px 0 20px" }}>
@@ -47,7 +84,16 @@ export function TaxModule({}: TaxModuleProps) {
 
       {/* Tappable hero — cycles verdict / new regime / old regime */}
       <div
+        {...heroPress.bind}
         onClick={cycleHero}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            cycleHero();
+          }
+        }}
+        role="button"
+        tabIndex={0}
         style={{
           textAlign: "center",
           padding: "24px 0 20px",
@@ -57,9 +103,28 @@ export function TaxModule({}: TaxModuleProps) {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
+          transform: heroPress.pressed
+            ? "translateY(1px) scale(0.992)"
+            : heroPress.hovered
+              ? "translateY(-1px)"
+              : "translateY(0)",
+          transition: "transform var(--motion-medium) var(--ease-premium)",
         }}
       >
-        {heroView === 0 && (
+        <div
+          style={{
+            minHeight: 112,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            opacity: heroContentVisible ? 1 : 0,
+            transform: heroContentVisible ? "translateY(0) scale(1)" : "translateY(8px) scale(0.985)",
+            transition:
+              "opacity var(--motion-medium) var(--ease-premium), transform var(--motion-slow) var(--ease-premium)",
+          }}
+        >
+        {displayHeroView === 0 && (
           <>
             <span
               style={{
@@ -73,7 +138,20 @@ export function TaxModule({}: TaxModuleProps) {
               monthly take-home
             </span>
             <SmoothNumber value={takeHome} prefix="₹" fontSize={40} />
-            <div style={{ marginTop: 12, fontSize: 12, color: "var(--text-muted-mid)" }}>
+            <div
+              style={{
+                marginTop: 12,
+                fontSize: 12,
+                color: "var(--text-muted-mid)",
+                padding: "6px 12px",
+                borderRadius: 999,
+                background: "var(--card-bg)",
+                border: "1px solid var(--border)",
+                transform: verdictPulse || tickPulse ? "scale(1.02)" : "scale(1)",
+                transition:
+                  "transform var(--motion-medium) var(--ease-premium), border-color var(--motion-medium) var(--ease-premium), background var(--motion-medium) var(--ease-premium)",
+              }}
+            >
               {betterRegime !== "same" ? (
                 <>
                   <span style={{ color: "var(--text-primary)", fontWeight: 400 }}>
@@ -90,7 +168,7 @@ export function TaxModule({}: TaxModuleProps) {
             </div>
           </>
         )}
-        {heroView === 1 && (
+        {displayHeroView === 1 && (
           <>
             <span
               style={{
@@ -113,7 +191,7 @@ export function TaxModule({}: TaxModuleProps) {
             </div>
           </>
         )}
-        {heroView === 2 && (
+        {displayHeroView === 2 && (
           <>
             <span
               style={{
@@ -136,17 +214,21 @@ export function TaxModule({}: TaxModuleProps) {
             </div>
           </>
         )}
+        </div>
         {/* View dots */}
         <div style={{ display: "flex", gap: 6, marginTop: 16 }}>
           {[0, 1, 2].map((i) => (
             <div
               key={i}
               style={{
-                width: i === heroView ? 8 : 4,
+                width: i === heroView ? 10 : 4,
                 height: 4,
                 borderRadius: 2,
                 background: i === heroView ? "var(--text-muted-mid)" : "var(--text-muted-faint)",
-                transition: "all 0.3s cubic-bezier(0.16,1,0.3,1)",
+                opacity: i === heroView ? 1 : 0.72,
+                transform: i === heroView ? "scaleX(1)" : "scaleX(0.92)",
+                transition:
+                  "width var(--motion-medium) var(--ease-premium), background var(--motion-medium) var(--ease-premium), opacity var(--motion-medium) var(--ease-premium), transform var(--motion-medium) var(--ease-premium)",
               }}
             />
           ))}
@@ -164,7 +246,13 @@ export function TaxModule({}: TaxModuleProps) {
                   ? "var(--bar-fill)"
                   : "var(--bar-bg)",
               borderRadius: 2,
-              transition: "flex 0.5s cubic-bezier(0.16,1,0.3,1)",
+              transform:
+                betterRegime === "new" || betterRegime === "same"
+                  ? `scaleY(${winnerScale.toFixed(3)})`
+                  : "scaleY(1)",
+              transformOrigin: "center",
+              transition:
+                "flex var(--motion-slow) var(--ease-premium), background var(--motion-medium) var(--ease-premium), transform var(--motion-medium) var(--ease-premium)",
             }}
           />
           <div
@@ -172,7 +260,10 @@ export function TaxModule({}: TaxModuleProps) {
               flex: totalOld || 1,
               background: betterRegime === "old" ? "var(--bar-fill)" : "var(--bar-bg)",
               borderRadius: 2,
-              transition: "flex 0.5s cubic-bezier(0.16,1,0.3,1)",
+              transform: betterRegime === "old" ? `scaleY(${winnerScale.toFixed(3)})` : "scaleY(1)",
+              transformOrigin: "center",
+              transition:
+                "flex var(--motion-slow) var(--ease-premium), background var(--motion-medium) var(--ease-premium), transform var(--motion-medium) var(--ease-premium)",
             }}
           />
         </div>
@@ -183,6 +274,7 @@ export function TaxModule({}: TaxModuleProps) {
               color: betterRegime !== "old" ? "var(--text-muted-mid)" : "var(--text-muted-faint)",
               letterSpacing: "0.06em",
               textTransform: "uppercase",
+              transition: "color var(--motion-medium) var(--ease-premium)",
             }}
           >
             New {fShort(totalNew)}
@@ -193,6 +285,7 @@ export function TaxModule({}: TaxModuleProps) {
               color: betterRegime === "old" ? "var(--text-muted-mid)" : "var(--text-muted-faint)",
               letterSpacing: "0.06em",
               textTransform: "uppercase",
+              transition: "color var(--motion-medium) var(--ease-premium)",
             }}
           >
             Old {fShort(totalOld)}
@@ -208,7 +301,8 @@ export function TaxModule({}: TaxModuleProps) {
         max={50000000}
         step={50000}
         sensitivity={2}
-        format={fShort}
+        format={(v) => fShortStep(v, 50000)}
+        scrubFormat={fINR}
         onVelocity={setVel}
         isAmount
         onChange={setIncome}
@@ -222,7 +316,8 @@ export function TaxModule({}: TaxModuleProps) {
         max={1000000}
         step={10000}
         sensitivity={1}
-        format={fShort}
+        format={(v) => fShortStep(v, 10000)}
+        scrubFormat={fINR}
         onVelocity={setVel}
         isAmount
         onChange={setDeductions}
@@ -233,10 +328,20 @@ export function TaxModule({}: TaxModuleProps) {
       {/* Slab breakdown — collapsible */}
       <div style={{ marginTop: 8 }}>
         <div
+          {...slabsPress.bind}
           onClick={() => {
             setSlabsOpen(!slabsOpen);
             Haptic.light();
           }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setSlabsOpen((v) => !v);
+              Haptic.light();
+            }
+          }}
+          role="button"
+          tabIndex={0}
           style={{
             display: "flex",
             alignItems: "center",
@@ -244,6 +349,8 @@ export function TaxModule({}: TaxModuleProps) {
             cursor: "pointer",
             padding: "14px 0",
             minHeight: 44,
+            transform: slabsPress.pressed ? "translateY(1px)" : "translateY(0)",
+            transition: "transform var(--motion-medium) var(--ease-premium)",
           }}
         >
           <span
@@ -261,7 +368,7 @@ export function TaxModule({}: TaxModuleProps) {
               fontSize: 12,
               color: "var(--text-muted-faint)",
               transform: slabsOpen ? "rotate(180deg)" : "none",
-              transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1)",
+              transition: "transform var(--motion-slow) var(--ease-premium), color var(--motion-medium) var(--ease-premium)",
               display: "inline-block",
             }}
           >
@@ -272,7 +379,8 @@ export function TaxModule({}: TaxModuleProps) {
           style={{
             maxHeight: slabsOpen ? 400 : 0,
             overflow: "hidden",
-            transition: "max-height 0.5s cubic-bezier(0.16,1,0.3,1)",
+            transition: "max-height var(--motion-slow) var(--ease-premium), opacity var(--motion-medium) var(--ease-premium)",
+            opacity: slabsOpen ? 1 : 0.72,
           }}
         >
           <div style={{ paddingBottom: 16 }}>
@@ -313,7 +421,10 @@ export function TaxModule({}: TaxModuleProps) {
                         width: `${Math.max(maxWidth, applicable ? 2 : 0)}%`,
                         borderRadius: 3,
                         background: applicable ? "var(--bar-fill)" : "var(--bar-bg)",
-                        transition: "width 0.3s ease",
+                        transform: applicable ? "scaleY(1.08)" : "scaleY(1)",
+                        transformOrigin: "center",
+                        transition:
+                          "width var(--motion-medium) var(--ease-premium), background var(--motion-medium) var(--ease-premium), transform var(--motion-medium) var(--ease-premium)",
                       }}
                     />
                   </div>
