@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { APP_MAX_CONTENT_WIDTH, APP_STORAGE_KEYS } from "@/lib/constants";
 import { ThemeProvider, useTheme } from "@/providers/ThemeProvider";
@@ -11,6 +11,21 @@ function Shell({ children }: Readonly<{ children: ReactNode }>) {
   const { dark, toggle } = useTheme();
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const [entered, setEntered] = useState(false);
+  const prevPath = useRef(pathname);
+
+  // Trigger entrance animation on route change
+  useEffect(() => {
+    if (pathname !== prevPath.current) {
+      setEntered(false);
+      prevPath.current = pathname;
+    }
+    // Use rAF to ensure the browser paints the initial state before animating
+    const raf = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setEntered(true));
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [pathname]);
 
   const [welcomed, setWelcomed] = useState(true);
 
@@ -57,9 +72,15 @@ function Shell({ children }: Readonly<{ children: ReactNode }>) {
       >
         <div
           key={pathname}
-          className="nav-in"
           style={{
+            opacity: entered ? 1 : 0,
+            transform: entered
+              ? "translateY(0) scale(1)"
+              : "translateY(8px) scale(0.992)",
             transformOrigin: isHome ? "center top" : "center 24px",
+            transition: entered
+              ? "opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)"
+              : "none",
             willChange: "transform, opacity",
           }}
         >
