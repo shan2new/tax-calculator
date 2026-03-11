@@ -216,9 +216,7 @@ export default async function LoanDetailPage({ params }: { params: Promise<PageP
         padding: "0 24px 40px",
         fontSize: "0.9em",
         color: "var(--text-muted)",
-        marginTop: 32,
-        borderTop: "1px solid var(--border, rgba(255,255,255,0.08))",
-        paddingTop: 8,
+        marginTop: 48,
         opacity: 0,
         animation: "navIn 0.5s cubic-bezier(0.16,1,0.3,1) 680ms both",
       }}>
@@ -233,13 +231,13 @@ export default async function LoanDetailPage({ params }: { params: Promise<PageP
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              padding: "4px 0",
+              padding: "12px 0",
             }}
           >
             <h2
               style={{
-                fontSize: 14,
-                fontWeight: 400,
+                fontSize: 13,
+                fontWeight: 300,
                 color: "var(--text-primary, #e8e4de)",
                 letterSpacing: "-0.01em",
                 margin: 0,
@@ -250,9 +248,10 @@ export default async function LoanDetailPage({ params }: { params: Promise<PageP
             <span
               style={{
                 flexShrink: 0,
-                fontSize: 14,
+                fontSize: 12,
                 color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
-                transition: "transform 0.2s ease",
+                transition: "transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)",
+                display: "inline-block",
               }}
             >
               ▾

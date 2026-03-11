@@ -19,8 +19,8 @@ const POPULAR_TAX = [
 ];
 
 const linkStyle: React.CSSProperties = {
-  fontSize: 11,
-  color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
+  fontSize: 12,
+  color: "var(--text-muted, rgba(255,255,255,0.5))",
   textDecoration: "none",
   lineHeight: 1.5,
   fontWeight: 300,
@@ -45,6 +45,10 @@ export function SEOFooter({ showLoans = true, showTax = true }: SEOFooterProps) 
       aria-label="Popular calculators"
       style={{
         marginTop: 24,
+        background: "var(--card-bg, rgba(255,255,255,0.03))",
+        border: "1px solid var(--border, rgba(255,255,255,0.08))",
+        borderRadius: 12,
+        padding: "14px 16px",
       }}
     >
       <div
@@ -63,7 +67,7 @@ export function SEOFooter({ showLoans = true, showTax = true }: SEOFooterProps) 
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
-          gap: "6px 12px",
+          gap: "8px 16px",
         }}
       >
         {links.map((link) => (

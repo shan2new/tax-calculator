@@ -8,14 +8,15 @@ const summaryStyle: React.CSSProperties = {
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
-  padding: "4px 0",
+  padding: "12px 0",
 };
 
 const chevronStyle: React.CSSProperties = {
   flexShrink: 0,
-  fontSize: 14,
+  fontSize: 12,
   color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
-  transition: "transform 0.2s ease",
+  transition: "transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)",
+  display: "inline-block",
 };
 
 export function TaxContent({ defaultOpen = false }: TaxContentProps) {
@@ -26,15 +27,15 @@ export function TaxContent({ defaultOpen = false }: TaxContentProps) {
         marginTop: 24,
         color: "var(--text-muted, rgba(255,255,255,0.5))",
         fontSize: 13,
-        lineHeight: 1.7,
+        lineHeight: 1.55,
         fontWeight: 300,
       }}
     >
       <summary style={summaryStyle}>
         <h2
           style={{
-            fontSize: 14,
-            fontWeight: 400,
+            fontSize: 13,
+            fontWeight: 300,
             color: "var(--text-primary, #e8e4de)",
             letterSpacing: "-0.01em",
             margin: 0,
@@ -55,7 +56,7 @@ export function TaxContent({ defaultOpen = false }: TaxContentProps) {
         <h3
           style={{
             fontSize: 13,
-            fontWeight: 400,
+            fontWeight: 300,
             color: "var(--text-primary, #e8e4de)",
             letterSpacing: "-0.01em",
             marginBottom: 8,
@@ -74,7 +75,7 @@ export function TaxContent({ defaultOpen = false }: TaxContentProps) {
         <h3
           style={{
             fontSize: 13,
-            fontWeight: 400,
+            fontWeight: 300,
             color: "var(--text-primary, #e8e4de)",
             letterSpacing: "-0.01em",
             marginBottom: 8,

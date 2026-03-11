@@ -62,9 +62,7 @@ export default function TaxPage() {
         padding: "0 24px 40px",
         fontSize: "0.9em",
         color: "var(--text-muted)",
-        marginTop: 32,
-        borderTop: "1px solid var(--border, rgba(255,255,255,0.08))",
-        paddingTop: 8,
+        marginTop: 48,
         opacity: 0,
         animation: "navIn 0.5s cubic-bezier(0.16,1,0.3,1) 560ms both",
       }}>

@@ -31,7 +31,7 @@ export function AmortizationTable({ years, crossoverIndex }: AmortizationTablePr
             <th
               style={{
                 textAlign: "left",
-                padding: "8px 6px",
+                padding: "8px 8px",
                 fontWeight: 400,
                 fontSize: 11,
                 color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
@@ -44,7 +44,7 @@ export function AmortizationTable({ years, crossoverIndex }: AmortizationTablePr
             <th
               style={{
                 textAlign: "right",
-                padding: "8px 6px",
+                padding: "8px 8px",
                 fontWeight: 400,
                 fontSize: 11,
                 color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
@@ -57,7 +57,7 @@ export function AmortizationTable({ years, crossoverIndex }: AmortizationTablePr
             <th
               style={{
                 textAlign: "right",
-                padding: "8px 6px",
+                padding: "8px 8px",
                 fontWeight: 400,
                 fontSize: 11,
                 color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
@@ -70,7 +70,7 @@ export function AmortizationTable({ years, crossoverIndex }: AmortizationTablePr
             <th
               style={{
                 textAlign: "right",
-                padding: "8px 6px",
+                padding: "8px 8px",
                 fontWeight: 400,
                 fontSize: 11,
                 color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
@@ -93,20 +93,20 @@ export function AmortizationTable({ years, crossoverIndex }: AmortizationTablePr
             >
               <td
                 style={{
-                  padding: "8px 6px",
+                  padding: "8px 8px",
                   color: idx === crossoverIndex ? "var(--text-positive, #a0dcb4)" : "var(--text-muted, rgba(255,255,255,0.5))",
                   fontWeight: idx === crossoverIndex ? 400 : 300,
                 }}
               >
                 {idx === crossoverIndex ? `Yr ${row.y} ↑` : `Yr ${row.y}`}
               </td>
-              <td style={{ textAlign: "right", padding: "8px 6px", fontVariantNumeric: "tabular-nums" }}>
+              <td style={{ textAlign: "right", padding: "8px 8px", fontVariantNumeric: "tabular-nums" }}>
                 {fShort(row.p)}
               </td>
               <td
                 style={{
                   textAlign: "right",
-                  padding: "8px 6px",
+                  padding: "8px 8px",
                   fontVariantNumeric: "tabular-nums",
                   color: row.i > row.p ? "var(--warn, rgba(255,180,160,0.85))" : "inherit",
                 }}
@@ -116,7 +116,7 @@ export function AmortizationTable({ years, crossoverIndex }: AmortizationTablePr
               <td
                 style={{
                   textAlign: "right",
-                  padding: "8px 6px",
+                  padding: "8px 8px",
                   fontVariantNumeric: "tabular-nums",
                   color: "var(--text-muted, rgba(255,255,255,0.5))",
                 }}

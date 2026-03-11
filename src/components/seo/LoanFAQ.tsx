@@ -109,13 +109,13 @@ export function LoanFAQ({ loanType, defaultOpen = false }: LoanFAQProps) {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            padding: "4px 0",
+            padding: "12px 0",
           }}
         >
           <h2
             style={{
-              fontSize: 14,
-              fontWeight: 400,
+              fontSize: 13,
+              fontWeight: 300,
               color: "var(--text-primary, #e8e4de)",
               letterSpacing: "-0.01em",
               margin: 0,
@@ -126,9 +126,10 @@ export function LoanFAQ({ loanType, defaultOpen = false }: LoanFAQProps) {
           <span
             style={{
               flexShrink: 0,
-              fontSize: 14,
+              fontSize: 12,
               color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
-              transition: "transform 0.2s ease",
+              transition: "transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)",
+              display: "inline-block",
             }}
           >
             ▾
@@ -140,7 +141,7 @@ export function LoanFAQ({ loanType, defaultOpen = false }: LoanFAQProps) {
               key={i}
               style={{
                 borderBottom: "1px solid var(--border, rgba(255,255,255,0.05))",
-                padding: "12px 0",
+                padding: "14px 0",
               }}
             >
               <summary
@@ -161,21 +162,21 @@ export function LoanFAQ({ loanType, defaultOpen = false }: LoanFAQProps) {
                 <span
                   style={{
                     flexShrink: 0,
-                    fontSize: 16,
+                    fontSize: 12,
                     color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
-                    lineHeight: 1,
-                    marginTop: 2,
+                    transition: "transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)",
+                    display: "inline-block",
                   }}
                 >
-                  +
+                  ▾
                 </span>
               </summary>
               <p
                 style={{
                   fontSize: 12,
                   color: "var(--text-muted, rgba(255,255,255,0.5))",
-                  lineHeight: 1.7,
-                  marginTop: 10,
+                  lineHeight: 1.55,
+                  marginTop: 12,
                   marginBottom: 0,
                   fontWeight: 300,
                 }}
