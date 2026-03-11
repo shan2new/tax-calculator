@@ -90,6 +90,19 @@ light: ringRGB [80,68,52],    warnRGB [168,72,40],   particleRGB [120,100,80]
 - Press feedback: scale to around `0.97`
 - Numeric smoothing: rAF interpolation with adaptive catch-up; avoid decorative scale pulses on live amounts
 
+### Route Entrance Choreography
+
+- `AppShell` container: `0.4s` reveal on Home (pairs with per-section stagger); `0.25s` on all sub-pages (container clears fast so section stagger plays in full visibility)
+- `NavHeader`: enters with `navIn 0.55s 50ms both` — anchor element on every sub-page
+- **Loans / Tax modules**: 3-stage stagger using `navIn` with `animation-fill-mode: both`:
+  - Stage 1 — hero viz (ring / take-home): `0.65s` delay `150ms`
+  - Stage 2 — actions + scrub controls: `0.55s` delay `280ms`
+  - Stage 3 — secondary content (amortization / slabs / disclaimers): `0.5s` delay `420ms`
+- **SEO zones** in page shells: `navIn 0.5s 560ms both` (fades in last, quietly)
+- Detail pages (`/loans/[type]/...`, `/tax/[fyYear]/...`) add two extra stages before the module: insights block (`120ms`) and section label (`260ms`)
+- `Legal` page: retains own `legalIn` stagger (blur + scale) — distinct character is appropriate for a primarily text page
+- `Home` page: retains own `homeIn` stagger — unchanged and best-in-class
+
 ## Interaction Contracts
 
 ### ScrubValue

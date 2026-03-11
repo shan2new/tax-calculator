@@ -84,6 +84,16 @@ src/styles/           tokens + keyframes
 - New UI libraries, animation libraries, or global state libraries unless explicitly requested.
 - Replacing scrub controls with sliders.
 
+## Route Entrance Motion (Current)
+
+- `AppShell` container: `0.4s` for Home, `0.25s` for all sub-pages
+- `NavHeader`: `navIn 0.55s 50ms both` on every sub-page
+- Modules: 3-stage `navIn` stagger — hero viz `150ms`, controls `280ms`, secondary `420ms`
+- SEO zones: `navIn 0.5s 560ms both`
+- Detail pages: insert insights `120ms` + label `260ms` before the module stages
+- `Home` and `Legal` keep their bespoke `homeIn`/`legalIn` stagger — do not replace
+- All section animations use `animation-fill-mode: both` (element starts invisible before delay; no flash on SSR)
+
 ## Interaction Constants (Current)
 
 - Loan amount: sensitivity `1.8`, tick by loan-type `tickStep`

@@ -8,7 +8,7 @@ import { Particles } from "@/components/canvas/Particles";
 import { WelcomeOverlay } from "@/screens/Welcome";
 
 function Shell({ children }: Readonly<{ children: ReactNode }>) {
-  const { dark, toggle } = useTheme();
+  const { dark } = useTheme();
   const pathname = usePathname();
   const isHome = pathname === "/";
   const [entered, setEntered] = useState(false);
@@ -37,6 +37,13 @@ function Shell({ children }: Readonly<{ children: ReactNode }>) {
     localStorage.setItem(APP_STORAGE_KEYS.welcomed, "1");
     setWelcomed(true);
   };
+
+  // Home gets a dramatic 0.4s container reveal that pairs with its own per-section stagger.
+  // Sub-pages use a fast 0.25s reveal so their section-level stagger plays in full visibility.
+  const exitTransform = isHome ? "translateY(8px) scale(0.992)" : "translateY(6px) scale(0.997)";
+  const enterTransition = isHome
+    ? "opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)"
+    : "opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)";
 
   return (
     <div
@@ -74,13 +81,9 @@ function Shell({ children }: Readonly<{ children: ReactNode }>) {
           key={pathname}
           style={{
             opacity: entered ? 1 : 0,
-            transform: entered
-              ? "translateY(0) scale(1)"
-              : "translateY(8px) scale(0.992)",
+            transform: entered ? "translateY(0) scale(1)" : exitTransform,
             transformOrigin: isHome ? "center top" : "center 24px",
-            transition: entered
-              ? "opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)"
-              : "none",
+            transition: entered ? enterTransition : "none",
             willChange: "transform, opacity",
           }}
         >

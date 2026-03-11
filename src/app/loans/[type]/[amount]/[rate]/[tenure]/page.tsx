@@ -151,7 +151,11 @@ export default async function LoanDetailPage({ params }: { params: Promise<PageP
         subtitle={`${emiStr}/mo · ${rate}% · ${tenure} yrs`}
       />
 
-      <div style={{ padding: "0 24px 24px" }}>
+      <div style={{
+        padding: "0 24px 24px",
+        opacity: 0,
+        animation: "navIn 0.65s cubic-bezier(0.16,1,0.3,1) 120ms both",
+      }}>
 
         <LoanInsights
           amount={amount}
@@ -174,6 +178,8 @@ export default async function LoanDetailPage({ params }: { params: Promise<PageP
           textTransform: "uppercase",
           margin: "0 0 8px",
           padding: "0 24px",
+          opacity: 0,
+          animation: "navIn 0.5s cubic-bezier(0.16,1,0.3,1) 260ms both",
         }}
       >
         Adjust &amp; Recalculate
@@ -187,7 +193,7 @@ export default async function LoanDetailPage({ params }: { params: Promise<PageP
       />
 
       {/* Tool Terminus */}
-      <div style={{ padding: "0 24px" }}>
+      <div style={{ padding: "0 24px", opacity: 0, animation: "navIn 0.5s cubic-bezier(0.16,1,0.3,1) 560ms both" }}>
         <p
           style={{
             fontSize: 11,
@@ -213,6 +219,8 @@ export default async function LoanDetailPage({ params }: { params: Promise<PageP
         marginTop: 32,
         borderTop: "1px solid var(--border, rgba(255,255,255,0.08))",
         paddingTop: 8,
+        opacity: 0,
+        animation: "navIn 0.5s cubic-bezier(0.16,1,0.3,1) 680ms both",
       }}>
         <details
           open

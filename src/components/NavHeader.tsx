@@ -23,6 +23,8 @@ export function NavHeader({ title, subtitle }: Readonly<NavHeaderProps>) {
         padding: "0 0 4px",
         minHeight: 44,
         gap: 8,
+        opacity: 0,
+        animation: "navIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) 50ms both",
       }}
     >
       <button

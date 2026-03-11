@@ -171,26 +171,29 @@ export function LoanModule({
 
   return (
     <div>
-      <LoanTypeTabs activeIndex={activeTypeIndex} onSelect={switchType} />
+      {/* Stage 1 — hero viz: tabs + ring (150ms) */}
+      <div style={{ opacity: 0, animation: "navIn 0.65s cubic-bezier(0.16,1,0.3,1) 150ms both" }}>
+        <LoanTypeTabs activeIndex={activeTypeIndex} onSelect={switchType} />
 
-      <LoanRingArea
-        dark={dark}
-        comparing={comparing}
-        pinned={pinned}
-        ir={interestRatio}
-        velocity={velocity}
-        tickSignal={tickSignal}
-        amount={amount}
-        rate={rate}
-        tenure={tenure}
-        emi={emi}
-        total={total}
-        interest={interest}
-        ringView={ringView}
-        displayRingView={displayRingView}
-        ringContentVisible={ringContentVisible}
-        onCycle={cycleRingView}
-      />
+        <LoanRingArea
+          dark={dark}
+          comparing={comparing}
+          pinned={pinned}
+          ir={interestRatio}
+          velocity={velocity}
+          tickSignal={tickSignal}
+          amount={amount}
+          rate={rate}
+          tenure={tenure}
+          emi={emi}
+          total={total}
+          interest={interest}
+          ringView={ringView}
+          displayRingView={displayRingView}
+          ringContentVisible={ringContentVisible}
+          onCycle={cycleRingView}
+        />
+      </div>
 
       {comparing && delta ? (
         <div
@@ -226,44 +229,50 @@ export function LoanModule({
         </div>
       ) : null}
 
-      <LoanActions
-        comparing={comparing}
-        ringView={ringView}
-        shareVisible={shareVisible}
-        onCompareToggle={(event) => {
-          event.stopPropagation();
-          if (comparing) clearCompare();
-          else pinCurrent();
-        }}
-        onShare={(event) => {
-          event.stopPropagation();
-          void handleShare();
-        }}
-      />
-
-      <LoanControls
-        loanType={loanType}
-        amount={amount}
-        rate={rate}
-        tenure={tenure}
-        onAmountChange={setAmount}
-        onRateChange={setRate}
-        onTenureChange={setTenure}
-        onVelocity={setVelocity}
-        onTick={fireTick}
-      />
-
-      {rate > 0 && tenure > 0 && emi > 0 ? (
-        <AmortizationChart
-          open={amortization.open}
-          onToggle={amortization.toggle}
-          years={years}
-          maxPrincipalAndInterest={maxPrincipalAndInterest}
-          crossoverIndex={crossoverIndex}
+      {/* Stage 2 — controls (280ms) */}
+      <div style={{ opacity: 0, animation: "navIn 0.55s cubic-bezier(0.16,1,0.3,1) 280ms both" }}>
+        <LoanActions
+          comparing={comparing}
+          ringView={ringView}
+          shareVisible={shareVisible}
+          onCompareToggle={(event) => {
+            event.stopPropagation();
+            if (comparing) clearCompare();
+            else pinCurrent();
+          }}
+          onShare={(event) => {
+            event.stopPropagation();
+            void handleShare();
+          }}
         />
-      ) : null}
 
-      <LoanDisclaimer />
+        <LoanControls
+          loanType={loanType}
+          amount={amount}
+          rate={rate}
+          tenure={tenure}
+          onAmountChange={setAmount}
+          onRateChange={setRate}
+          onTenureChange={setTenure}
+          onVelocity={setVelocity}
+          onTick={fireTick}
+        />
+      </div>
+
+      {/* Stage 3 — secondary content (420ms) */}
+      <div style={{ opacity: 0, animation: "navIn 0.5s cubic-bezier(0.16,1,0.3,1) 420ms both" }}>
+        {rate > 0 && tenure > 0 && emi > 0 ? (
+          <AmortizationChart
+            open={amortization.open}
+            onToggle={amortization.toggle}
+            years={years}
+            maxPrincipalAndInterest={maxPrincipalAndInterest}
+            crossoverIndex={crossoverIndex}
+          />
+        ) : null}
+
+        <LoanDisclaimer />
+      </div>
     </div>
   );
 }

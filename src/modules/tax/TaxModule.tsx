@@ -132,51 +132,60 @@ export function TaxModule({ initialIncome = 1500000, initialDeductions = 200000 
 
   return (
     <div>
-      <TaxHero
-        heroView={heroView}
-        displayHeroView={displayHeroView}
-        heroContentVisible={heroContentVisible}
-        takeHome={takeHome}
-        betterRegime={betterRegime}
-        savings={savings}
-        effectiveRate={effectiveRate}
-        totalNew={totalNew}
-        totalOld={totalOld}
-        income={income}
-        deductions={deductions}
-        cessNew={cessNew}
-        verdictPulse={verdictPulse}
-        tickPulse={tickPulse}
-        onCycle={cycleHero}
-      />
+      {/* Stage 1 — hero viz: take-home + regime bar (150ms) */}
+      <div style={{ opacity: 0, animation: "navIn 0.65s cubic-bezier(0.16,1,0.3,1) 150ms both" }}>
+        <TaxHero
+          heroView={heroView}
+          displayHeroView={displayHeroView}
+          heroContentVisible={heroContentVisible}
+          takeHome={takeHome}
+          betterRegime={betterRegime}
+          savings={savings}
+          effectiveRate={effectiveRate}
+          totalNew={totalNew}
+          totalOld={totalOld}
+          income={income}
+          deductions={deductions}
+          cessNew={cessNew}
+          verdictPulse={verdictPulse}
+          tickPulse={tickPulse}
+          onCycle={cycleHero}
+        />
 
-      <RegimeBar
-        totalNew={totalNew}
-        totalOld={totalOld}
-        betterRegime={betterRegime}
-        winnerScale={winnerScale}
-      />
+        <RegimeBar
+          totalNew={totalNew}
+          totalOld={totalOld}
+          betterRegime={betterRegime}
+          winnerScale={winnerScale}
+        />
+      </div>
 
-      <TaxActions
-        heroView={heroView}
-        shareVisible={shareVisible}
-        onShare={(event) => {
-          event.stopPropagation();
-          void handleShare();
-        }}
-      />
+      {/* Stage 2 — controls (280ms) */}
+      <div style={{ opacity: 0, animation: "navIn 0.55s cubic-bezier(0.16,1,0.3,1) 280ms both" }}>
+        <TaxActions
+          heroView={heroView}
+          shareVisible={shareVisible}
+          onShare={(event) => {
+            event.stopPropagation();
+            void handleShare();
+          }}
+        />
 
-      <TaxControls
-        income={income}
-        deductions={deductions}
-        onIncomeChange={setIncome}
-        onDeductionsChange={setDeductions}
-        onVelocity={setVelocity}
-        onTick={fireTick}
-      />
+        <TaxControls
+          income={income}
+          deductions={deductions}
+          onIncomeChange={setIncome}
+          onDeductionsChange={setDeductions}
+          onVelocity={setVelocity}
+          onTick={fireTick}
+        />
+      </div>
 
-      <SlabBreakdown open={slabs.open} onToggle={slabs.toggle} income={income} />
-      <TaxDisclaimer />
+      {/* Stage 3 — secondary content (420ms) */}
+      <div style={{ opacity: 0, animation: "navIn 0.5s cubic-bezier(0.16,1,0.3,1) 420ms both" }}>
+        <SlabBreakdown open={slabs.open} onToggle={slabs.toggle} income={income} />
+        <TaxDisclaimer />
+      </div>
     </div>
   );
 }
