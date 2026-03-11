@@ -16,7 +16,9 @@ body {
   overscroll-behavior: none;
 }
 
+html,
 body {
+  background: #050505;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
