@@ -11,7 +11,7 @@ export const LOAN_CONFIGS: LoanConfig[] = [
   {
     slug: 'home-loan',
     label: 'Home Loan',
-    typeIndex: 0,
+    typeIndex: 2,
     amounts: ['10-lakh', '20-lakh', '25-lakh', '30-lakh', '40-lakh', '50-lakh', '60-lakh', '75-lakh', '1-crore'],
     rates: ['7.5', '8', '8.5', '9', '9.5'],
     tenures: ['10', '15', '20', '25', '30'],
@@ -27,7 +27,7 @@ export const LOAN_CONFIGS: LoanConfig[] = [
   {
     slug: 'personal-loan',
     label: 'Personal Loan',
-    typeIndex: 2,
+    typeIndex: 0,
     amounts: ['1-lakh', '2-lakh', '3-lakh', '5-lakh', '10-lakh'],
     rates: ['10', '11', '12', '14', '16'],
     tenures: ['1', '2', '3', '5'],

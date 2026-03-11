@@ -137,14 +137,14 @@ export function LoanModule({
     if (!blob) return;
 
     const file = new File([blob], "claros-loan.png", { type: "image/png" });
-    const shareUrl = buildLoanShareUrl(amount, rate, tenure);
+    const shareUrl = buildLoanShareUrl(amount, rate, tenure, loanType.id);
 
     if (navigator.share && navigator.canShare?.({ files: [file] })) {
       try {
         await navigator.share({
           files: [file],
-          title: `Loan: ${fShort(amount)} @ ${rate}%`,
-          text: `EMI: ${fINR(Math.round(emi))}/mo for ${tenure}yrs`,
+          title: `${loanType.label} Loan EMI: ${fINR(Math.round(emi))}/mo — Claros`,
+          text: `${fShort(amount)} @ ${rate}% for ${tenure}yrs · Total: ${fShort(total)} · ${Math.round(interestRatio * 100)}% goes to interest`,
           url: shareUrl,
         });
       } catch {

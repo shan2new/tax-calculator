@@ -16,7 +16,11 @@ interface TaxShareCardParams {
 }
 
 export function buildTaxShareUrl(income: number) {
-  return `https://getclaros.in/tax?i=${income}`;
+  const slug =
+    income >= 1e7
+      ? `${income / 1e7}-crore`
+      : `${income / 1e5}-lpa`;
+  return `https://getclaros.in/tax/fy-2025-26/${slug}`;
 }
 
 export function buildTaxShareCardBlob({
@@ -154,12 +158,12 @@ export function buildTaxShareCardBlob({
 
     // Footer
     ctx.font = "200 11px -apple-system, system-ui, sans-serif";
-    ctx.fillStyle = faintColor;
+    ctx.fillStyle = dark ? "rgba(255,255,255,0.32)" : "rgba(42,37,32,0.32)";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText("C L A R O S", width / 2, height - 50);
     ctx.font = "300 10px -apple-system, system-ui, sans-serif";
-    ctx.fillStyle = dark ? "rgba(255,255,255,0.18)" : "rgba(42,37,32,0.18)";
+    ctx.fillStyle = dark ? "rgba(255,255,255,0.24)" : "rgba(42,37,32,0.24)";
     ctx.fillText("getclaros.in", width / 2, height - 32);
 
     canvas.toBlob((blob) => resolve(blob), "image/png");
@@ -178,8 +182,20 @@ interface LoanShareCardParams {
   delta: LoanDelta | null;
 }
 
-export function buildLoanShareUrl(amount: number, rate: number, tenure: number) {
-  return `https://getclaros.in/loans?a=${amount}&r=${rate}&t=${tenure}`;
+const LOAN_TYPE_SLUGS: Record<string, string> = {
+  personal: "personal-loan",
+  car: "car-loan",
+  home: "home-loan",
+  education: "education-loan",
+};
+
+export function buildLoanShareUrl(amount: number, rate: number, tenure: number, loanTypeId = "personal") {
+  const typeSlug = LOAN_TYPE_SLUGS[loanTypeId] ?? "personal-loan";
+  const amtSlug =
+    amount >= 1e7
+      ? `${amount / 1e7}-crore`
+      : `${amount / 1e5}-lakh`;
+  return `https://getclaros.in/loans/${typeSlug}/${amtSlug}/${rate}-percent/${tenure}-years`;
 }
 
 export function buildLoanShareCardBlob({
@@ -302,11 +318,11 @@ export function buildLoanShareCardBlob({
     }
 
     ctx.font = "200 11px -apple-system, system-ui, sans-serif";
-    ctx.fillStyle = faintColor;
+    ctx.fillStyle = dark ? "rgba(255,255,255,0.32)" : "rgba(42,37,32,0.32)";
     ctx.textAlign = "center";
     ctx.fillText("C L A R O S", width / 2, height - 50);
     ctx.font = "300 10px -apple-system, system-ui, sans-serif";
-    ctx.fillStyle = dark ? "rgba(255,255,255,0.18)" : "rgba(42,37,32,0.18)";
+    ctx.fillStyle = dark ? "rgba(255,255,255,0.24)" : "rgba(42,37,32,0.24)";
     ctx.fillText("getclaros.in", width / 2, height - 32);
 
     canvas.toBlob((blob) => resolve(blob), "image/png");
