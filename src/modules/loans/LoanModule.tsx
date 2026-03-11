@@ -144,7 +144,7 @@ export function LoanModule({
         await navigator.share({
           files: [file],
           title: `Loan: ${fShort(amount)} @ ${rate}%`,
-          text: `EMI: ${fINR(Math.round(emi))}/mo for ${tenure}yrs\n${shareUrl}`,
+          text: `EMI: ${fINR(Math.round(emi))}/mo for ${tenure}yrs`,
           url: shareUrl,
         });
       } catch {

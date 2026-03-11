@@ -501,7 +501,7 @@ export function ScrubValue({
   useEffect(() => {
     if (editing && inputRef.current) {
       const input = inputRef.current;
-      input.focus();
+      input.focus({ preventScroll: true });
       input.select();
     }
   }, [editing]);

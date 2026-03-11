@@ -105,7 +105,7 @@ export function TaxModule({ initialIncome = 1500000, initialDeductions = 200000 
         await navigator.share({
           files: [file],
           title: `Tax on ${fShort(income)} — ${regimeLabel} regime`,
-          text: `Take-home: ${fINR(takeHome)}/mo · ${effectiveRate.toFixed(1)}% effective\n${shareUrl}`,
+          text: `Take-home: ${fINR(takeHome)}/mo · ${effectiveRate.toFixed(1)}% effective`,
           url: shareUrl,
         });
       } catch {

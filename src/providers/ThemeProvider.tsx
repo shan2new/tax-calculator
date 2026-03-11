@@ -24,7 +24,9 @@ export function ThemeProvider({ children }: Readonly<{ children: ReactNode }>) {
 
   // Sync html/body background for iOS overscroll bounce and safe-area regions
   useEffect(() => {
-    document.documentElement.style.background = dark ? "#050505" : "#F8F6F2";
+    const bg = dark ? "#050505" : "#F8F6F2";
+    document.documentElement.style.background = bg;
+    document.body.style.background = bg;
   }, [dark]);
 
   const toggle = () =>
