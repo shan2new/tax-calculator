@@ -120,9 +120,9 @@ export function LoanModule({ dark }: LoanModuleProps) {
     ctx.fillRect(0, 0, W, H);
 
     const textColor = isDark ? "#E8E4DE" : "#2A2520";
-    const mutedColor = isDark ? "rgba(255,255,255,0.3)" : "rgba(42,37,32,0.3)";
-    const faintColor = isDark ? "rgba(255,255,255,0.12)" : "rgba(42,37,32,0.12)";
-    const warnColor = isDark ? "rgba(255,185,165,0.7)" : "rgba(172,68,40,0.7)";
+    const mutedColor = isDark ? "rgba(255,255,255,0.5)" : "rgba(42,37,32,0.52)";
+    const faintColor = isDark ? "rgba(255,255,255,0.25)" : "rgba(42,37,32,0.28)";
+    const warnColor = isDark ? "rgba(255,185,165,0.85)" : "rgba(172,68,40,0.85)";
 
     // Draw ring (simplified static version)
     const cx = W / 2,
@@ -223,7 +223,7 @@ export function LoanModule({ dark }: LoanModuleProps) {
     ctx.textAlign = "center";
     ctx.fillText("C L A R O S", W / 2, H - 50);
     ctx.font = "300 10px -apple-system, system-ui, sans-serif";
-    ctx.fillStyle = isDark ? "rgba(255,255,255,0.08)" : "rgba(42,37,32,0.08)";
+    ctx.fillStyle = isDark ? "rgba(255,255,255,0.18)" : "rgba(42,37,32,0.18)";
     ctx.fillText("claros.app", W / 2, H - 32);
 
     // Export

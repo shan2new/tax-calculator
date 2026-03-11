@@ -1,0 +1,17 @@
+---
+description: Claros UI and interaction design contract
+alwaysApply: true
+---
+
+# Claros Design Rule
+
+- Read `DESIGN.md` before any UI/UX change.
+- Treat `DESIGN.md` as the source of truth for:
+  - brand language
+  - layout and hierarchy
+  - interaction contracts (scrub/ring/hero)
+  - motion and performance constraints
+  - privacy-reality alignment
+- If implementation and docs diverge, update both `DESIGN.md` and `CLAUDE.md` in the same change.
+- Apply a ruthless-update policy: remove stale guidance, compress repetition, and keep instructions token-efficient.
+- Prefer concise actionable bullets over paragraphs when updating docs or rules.
