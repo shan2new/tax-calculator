@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <style>
+      :root {
+        --bg: rgba(250, 247, 242, 0.96);
+        --edge: rgba(80, 68, 52, 0.12);
+        --outer: rgb(80, 68, 52);
+        --inner: rgba(80, 68, 52, 0.32);
+        --dot: rgba(80, 68, 52, 0.82);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: rgba(8, 8, 8, 0.96);
+          --edge: rgba(232, 228, 222, 0.08);
+          --outer: rgb(232, 228, 222);
+          --inner: rgba(232, 228, 222, 0.34);
+          --dot: rgba(232, 228, 222, 0.92);
+        }
+      }
+    </style>
+  </defs>
+
+  <circle cx="64" cy="64" r="51" fill="var(--bg)" stroke="var(--edge)" stroke-width="2" />
+
+  <g transform="rotate(-112 64 64)">
+    <circle
+      cx="64"
+      cy="64"
+      r="33"
+      fill="none"
+      stroke="var(--outer)"
+      stroke-width="8"
+      stroke-linecap="round"
+      stroke-dasharray="160 50"
+    />
+    <circle
+      cx="64"
+      cy="64"
+      r="20"
+      fill="none"
+      stroke="var(--inner)"
+      stroke-width="5.5"
+      stroke-linecap="round"
+      stroke-dasharray="94 32"
+    />
+  </g>
+
+  <circle cx="91" cy="78" r="3.5" fill="var(--dot)" />
+</svg>
