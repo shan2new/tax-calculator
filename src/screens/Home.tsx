@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { BrandMark } from "@/components/BrandMark";
 import { MiniRing } from "@/components/MiniRing";
 import { MiniTaxViz } from "@/components/MiniTaxViz";
@@ -7,7 +8,6 @@ import { PressableCard } from "@/components/PressableCard";
 import { Haptic } from "@/hooks/useHaptic";
 
 interface HomeScreenProps {
-  onNavigate: (screen: string) => void;
   dark: boolean;
 }
 
@@ -20,10 +20,11 @@ function getGreeting(): string {
   return "Good evening";
 }
 
-export function HomeScreen({ onNavigate, dark }: HomeScreenProps) {
+export function HomeScreen({ dark }: HomeScreenProps) {
+  const router = useRouter();
   const modules = [
-    { id: "loans", title: "Loans", desc: "See what your money really costs", viz: <MiniRing dark={dark} /> },
-    { id: "tax", title: "Income Tax", desc: "Old vs New — find what saves more", viz: <MiniTaxViz dark={dark} /> },
+    { id: "/loans", title: "Loans", desc: "See what your money really costs", viz: <MiniRing dark={dark} /> },
+    { id: "/tax", title: "Income Tax", desc: "Old vs New — find what saves more", viz: <MiniTaxViz dark={dark} /> },
   ];
 
   const greeting = getGreeting();
@@ -90,7 +91,7 @@ export function HomeScreen({ onNavigate, dark }: HomeScreenProps) {
             key={m.id}
             onClick={() => {
               Haptic.medium();
-              onNavigate(m.id);
+              router.push(m.id);
             }}
             delay={idx * 120 + 300}
           >
@@ -148,7 +149,7 @@ export function HomeScreen({ onNavigate, dark }: HomeScreenProps) {
         <button
           onClick={() => {
             Haptic.light();
-            onNavigate("legal");
+            router.push("/legal");
           }}
           style={{
             background: "transparent",

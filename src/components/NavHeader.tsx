@@ -1,13 +1,14 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { Haptic } from "@/hooks/useHaptic";
 
 interface NavHeaderProps {
   title: string;
-  onBack: () => void;
 }
 
-export function NavHeader({ title, onBack }: NavHeaderProps) {
+export function NavHeader({ title }: NavHeaderProps) {
+  const router = useRouter();
   return (
     <div
       style={{
@@ -21,7 +22,7 @@ export function NavHeader({ title, onBack }: NavHeaderProps) {
       <button
         onClick={() => {
           Haptic.light();
-          onBack();
+          router.push("/");
         }}
         style={{
           background: "transparent",
