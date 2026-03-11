@@ -317,13 +317,36 @@ export function buildLoanShareCardBlob({
       );
     }
 
+    const brandX = width / 2;
+    const brandY = height - 56;
+    const brandColor = dark ? "rgba(255,255,255,0.42)" : "rgba(42,37,32,0.4)";
+    const brandOuter = 14;
+    const brandInner = 9;
+    const brandStart = -2.25;
+    const brandEnd = 2.25;
+
+    // Intrusive on purpose: keep the mark visible in every share crop.
+    ctx.beginPath();
+    ctx.arc(brandX, brandY, brandOuter, brandStart, brandEnd, false);
+    ctx.strokeStyle = brandColor;
+    ctx.lineWidth = 1.8;
+    ctx.lineCap = "round";
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(brandX, brandY, brandInner, -2.0, 2.0, false);
+    ctx.strokeStyle = dark ? "rgba(255,255,255,0.26)" : "rgba(42,37,32,0.24)";
+    ctx.lineWidth = 1.3;
+    ctx.lineCap = "round";
+    ctx.stroke();
+
     ctx.font = "200 11px -apple-system, system-ui, sans-serif";
-    ctx.fillStyle = dark ? "rgba(255,255,255,0.32)" : "rgba(42,37,32,0.32)";
+    ctx.fillStyle = dark ? "rgba(255,255,255,0.38)" : "rgba(42,37,32,0.36)";
     ctx.textAlign = "center";
-    ctx.fillText("C L A R O S", width / 2, height - 50);
+    ctx.fillText("C L A R O S", width / 2, height - 34);
     ctx.font = "300 10px -apple-system, system-ui, sans-serif";
     ctx.fillStyle = dark ? "rgba(255,255,255,0.24)" : "rgba(42,37,32,0.24)";
-    ctx.fillText("getclaros.in", width / 2, height - 32);
+    ctx.fillText("getclaros.in", width / 2, height - 18);
 
     canvas.toBlob((blob) => resolve(blob), "image/png");
   });

@@ -9,8 +9,18 @@ function getUnitPrecision(unit: number, step: number, maxDecimals: number): numb
 }
 
 export const fShort = (n: number): string => {
-  if (n >= 1e7) return `₹${(n / 1e7).toFixed(n % 1e7 === 0 ? 0 : 1)} Cr`;
-  if (n >= 1e5) return `₹${(n / 1e5).toFixed(n % 1e5 === 0 ? 0 : 1)} L`;
+  if (n >= 1e7) {
+    const v = n / 1e7;
+    return `₹${v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)} Cr`;
+  }
+  if (n >= 1e5) {
+    const v = n / 1e5;
+    return `₹${v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)} L`;
+  }
+  if (n >= 1e3) {
+    const v = n / 1e3;
+    return `₹${v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)}K`;
+  }
   return fINR(n);
 };
 
@@ -20,6 +30,9 @@ export const fShortStep = (n: number, step: number): string => {
   }
   if (n >= 1e5) {
     return `₹${(n / 1e5).toFixed(getUnitPrecision(1e5, step, 1))} L`;
+  }
+  if (n >= 1e3) {
+    return `₹${(n / 1e3).toFixed(getUnitPrecision(1e3, step, 1))}K`;
   }
   return fINR(n);
 };

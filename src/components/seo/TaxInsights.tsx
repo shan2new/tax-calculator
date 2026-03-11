@@ -1,7 +1,8 @@
 const fINR = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
 const fShort = (n: number) => {
-  if (n >= 1e7) return `₹${(n / 1e7).toFixed(1)} Cr`;
-  if (n >= 1e5) return `₹${(n / 1e5).toFixed(1)} L`;
+  if (n >= 1e7) return `₹${(n / 1e7).toFixed(n % 1e7 === 0 ? 0 : 1)} Cr`;
+  if (n >= 1e5) return `₹${(n / 1e5).toFixed(n % 1e5 === 0 ? 0 : 1)} L`;
+  if (n >= 1e3) return `₹${(n / 1e3).toFixed(n % 1e3 === 0 ? 0 : 1)}K`;
   return fINR(n);
 };
 
@@ -16,32 +17,15 @@ interface TaxInsightsProps {
   deductions: number;
 }
 
-const statLabelStyle: React.CSSProperties = {
-  fontSize: 10,
-  fontWeight: 400,
-  letterSpacing: "0.06em",
-  textTransform: "uppercase",
-  color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
-  marginBottom: 4,
-};
-
-const statValueStyle: React.CSSProperties = {
-  fontSize: 20,
-  fontWeight: 300,
-  fontVariantNumeric: "tabular-nums",
-  color: "var(--text-primary, #e8e4de)",
-  letterSpacing: "-0.02em",
-  lineHeight: 1.2,
-};
-
 export function TaxInsights({
   totalNew,
   totalOld,
   takeHome,
+  effectiveRate,
   savings,
   betterRegime,
 }: TaxInsightsProps) {
-  const regimeLabel = betterRegime === "new" ? "New Regime" : betterRegime === "old" ? "Old Regime" : "Both Regimes";
+  const regimeLabel = betterRegime === "new" ? "New" : betterRegime === "old" ? "Old" : "Both";
   const absSavings = Math.abs(savings);
 
   return (
@@ -53,74 +37,96 @@ export function TaxInsights({
         padding: "20px 24px",
       }}
     >
+      {/* Hero: Monthly take-home */}
+      <div style={{ marginBottom: 16 }}>
+        <div style={statLabel}>Monthly Take-Home</div>
+        <div
+          style={{
+            fontSize: 32,
+            fontWeight: 200,
+            fontVariantNumeric: "tabular-nums",
+            color: "var(--text-primary, #e8e4de)",
+            letterSpacing: "-0.03em",
+            lineHeight: 1,
+          }}
+        >
+          {fINR(takeHome)}
+        </div>
+        <div
+          style={{
+            fontSize: 12,
+            fontWeight: 300,
+            color: "var(--text-muted, rgba(255,255,255,0.4))",
+            marginTop: 6,
+          }}
+        >
+          {effectiveRate.toFixed(1)}% effective tax rate
+        </div>
+      </div>
+
+      {/* Regime comparison */}
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
-          gap: 16,
+          gap: 24,
+          paddingTop: 14,
+          borderTop: "1px solid var(--border, rgba(255,255,255,0.06))",
         }}
       >
-        <div style={{ flex: 1 }}>
-          <div style={statLabelStyle}>New Regime</div>
+        <div>
+          <div style={statLabel}>New Regime</div>
           <div
             style={{
-              ...statValueStyle,
-              color:
-                betterRegime === "new"
-                  ? "var(--text-positive, #a0dcb4)"
-                  : "var(--text-primary, #e8e4de)",
+              ...statValue,
+              color: betterRegime === "new"
+                ? "var(--text-positive, #a0dcb4)"
+                : "var(--text-primary, #e8e4de)",
             }}
           >
             {fShort(totalNew)}
           </div>
         </div>
-        <div style={{ flex: 1, textAlign: "right" }}>
-          <div style={statLabelStyle}>Old Regime</div>
+        <div>
+          <div style={statLabel}>Old Regime</div>
           <div
             style={{
-              ...statValueStyle,
-              color:
-                betterRegime === "old"
-                  ? "var(--text-positive, #a0dcb4)"
-                  : "var(--text-primary, #e8e4de)",
+              ...statValue,
+              color: betterRegime === "old"
+                ? "var(--text-positive, #a0dcb4)"
+                : "var(--text-primary, #e8e4de)",
             }}
           >
             {fShort(totalOld)}
           </div>
         </div>
-      </div>
-
-      <div
-        style={{
-          marginTop: 14,
-          paddingTop: 12,
-          borderTop: "1px solid var(--border, rgba(255,255,255,0.06))",
-          display: "flex",
-          flexDirection: "column",
-          gap: 4,
-        }}
-      >
         {betterRegime !== "same" && absSavings > 0 && (
-          <div
-            style={{
-              fontSize: 13,
-              fontWeight: 300,
-              color: "var(--text-positive, #a0dcb4)",
-            }}
-          >
-            Save {fShort(absSavings)} with {regimeLabel}
+          <div>
+            <div style={statLabel}>You Save</div>
+            <div style={{ ...statValue, color: "var(--text-positive, #a0dcb4)" }}>
+              {fShort(absSavings)}
+              <span style={{ fontSize: 11, fontWeight: 400, opacity: 0.6 }}> ({regimeLabel})</span>
+            </div>
           </div>
         )}
-        <div
-          style={{
-            fontSize: 12,
-            color: "var(--text-muted, rgba(255,255,255,0.4))",
-            fontWeight: 300,
-          }}
-        >
-          Monthly take-home: {fINR(takeHome)}
-        </div>
       </div>
     </div>
   );
 }
+
+const statLabel: React.CSSProperties = {
+  fontSize: 10,
+  fontWeight: 400,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
+  marginBottom: 6,
+};
+
+const statValue: React.CSSProperties = {
+  fontSize: 16,
+  fontWeight: 300,
+  fontVariantNumeric: "tabular-nums",
+  color: "var(--text-primary, #e8e4de)",
+  letterSpacing: "-0.02em",
+  lineHeight: 1.3,
+};

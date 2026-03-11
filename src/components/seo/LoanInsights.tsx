@@ -2,8 +2,9 @@ import type { YearData } from "@/lib/calc";
 
 const fINR = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
 const fShort = (n: number) => {
-  if (n >= 1e7) return `₹${(n / 1e7).toFixed(1)} Cr`;
-  if (n >= 1e5) return `₹${(n / 1e5).toFixed(1)} L`;
+  if (n >= 1e7) return `₹${(n / 1e7).toFixed(n % 1e7 === 0 ? 0 : 1)} Cr`;
+  if (n >= 1e5) return `₹${(n / 1e5).toFixed(n % 1e5 === 0 ? 0 : 1)} L`;
+  if (n >= 1e3) return `₹${(n / 1e3).toFixed(n % 1e3 === 0 ? 0 : 1)}K`;
   return fINR(n);
 };
 
@@ -19,33 +20,13 @@ interface LoanInsightsProps {
   loanLabel: string;
 }
 
-const statLabelStyle: React.CSSProperties = {
-  fontSize: 10,
-  fontWeight: 400,
-  letterSpacing: "0.06em",
-  textTransform: "uppercase",
-  color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
-  marginBottom: 4,
-};
-
-const statValueStyle: React.CSSProperties = {
-  fontSize: 20,
-  fontWeight: 300,
-  fontVariantNumeric: "tabular-nums",
-  color: "var(--text-primary, #e8e4de)",
-  letterSpacing: "-0.02em",
-  lineHeight: 1.2,
-};
-
 export function LoanInsights({
-  amount,
-  rate,
-  tenure,
-  emi,
   total,
   interest,
-  loanLabel,
+  emi,
 }: LoanInsightsProps) {
+  const ir = total > 0 ? interest / total : 0;
+
   return (
     <div
       style={{
@@ -55,39 +36,72 @@ export function LoanInsights({
         padding: "20px 24px",
       }}
     >
+      {/* Hero EMI */}
+      <div style={{ marginBottom: 16 }}>
+        <div style={statLabel}>Monthly EMI</div>
+        <div
+          style={{
+            fontSize: 32,
+            fontWeight: 200,
+            fontVariantNumeric: "tabular-nums",
+            color: "var(--text-primary, #e8e4de)",
+            letterSpacing: "-0.03em",
+            lineHeight: 1,
+          }}
+        >
+          {fINR(Math.round(emi))}
+        </div>
+      </div>
+
+      {/* Stats row */}
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
-          gap: 16,
-        }}
-      >
-        <div style={{ flex: 1 }}>
-          <div style={statLabelStyle}>EMI</div>
-          <div style={statValueStyle}>{fINR(Math.round(emi))}</div>
-          <div style={{ ...statLabelStyle, marginTop: 2, marginBottom: 0, fontSize: 11 }}>/mo</div>
-        </div>
-        <div style={{ flex: 1, textAlign: "center" }}>
-          <div style={statLabelStyle}>Total Interest</div>
-          <div style={statValueStyle}>{fShort(interest)}</div>
-        </div>
-        <div style={{ flex: 1, textAlign: "right" }}>
-          <div style={statLabelStyle}>Total Payment</div>
-          <div style={statValueStyle}>{fShort(total)}</div>
-        </div>
-      </div>
-      <div
-        style={{
-          marginTop: 14,
-          paddingTop: 12,
+          gap: 24,
+          paddingTop: 14,
           borderTop: "1px solid var(--border, rgba(255,255,255,0.06))",
-          fontSize: 12,
-          color: "var(--text-muted, rgba(255,255,255,0.4))",
-          fontWeight: 300,
         }}
       >
-        {fShort(amount)} {loanLabel} · {rate}% · {tenure} years
+        <div>
+          <div style={statLabel}>Total Interest</div>
+          <div style={statValue}>{fShort(interest)}</div>
+        </div>
+        <div>
+          <div style={statLabel}>Total Payable</div>
+          <div style={statValue}>{fShort(total)}</div>
+        </div>
+        <div>
+          <div style={statLabel}>Interest Share</div>
+          <div
+            style={{
+              ...statValue,
+              color: ir > 0.5
+                ? "var(--warn, rgba(255,185,165,0.85))"
+                : "var(--text-primary, #e8e4de)",
+            }}
+          >
+            {Math.round(ir * 100)}%
+          </div>
+        </div>
       </div>
     </div>
   );
 }
+
+const statLabel: React.CSSProperties = {
+  fontSize: 10,
+  fontWeight: 400,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
+  marginBottom: 6,
+};
+
+const statValue: React.CSSProperties = {
+  fontSize: 16,
+  fontWeight: 300,
+  fontVariantNumeric: "tabular-nums",
+  color: "var(--text-primary, #e8e4de)",
+  letterSpacing: "-0.02em",
+  lineHeight: 1.3,
+};

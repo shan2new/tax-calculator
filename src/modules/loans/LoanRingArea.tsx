@@ -252,7 +252,7 @@ export function LoanRingArea({
                   ) : null}
 
                   {displayRingView === 1 ? (
-                    <div style={{ display: "flex", gap: 24, alignItems: "flex-end" }}>
+                    <div style={{ display: "flex", gap: 16, alignItems: "flex-end" }}>
                       <div style={{ textAlign: "center" }}>
                         <div
                           style={{
@@ -267,11 +267,12 @@ export function LoanRingArea({
                         </div>
                         <div
                           style={{
-                            fontSize: 22,
+                            fontSize: 20,
                             fontWeight: 200,
                             color: "var(--text-primary)",
                             fontFamily: "var(--font)",
                             letterSpacing: "-0.03em",
+                            whiteSpace: "nowrap",
                           }}
                         >
                           {fShort(amount)}
@@ -281,7 +282,7 @@ export function LoanRingArea({
                         style={{
                           fontSize: 14,
                           color: "var(--text-muted-faint)",
-                          marginBottom: 4,
+                          marginBottom: 3,
                         }}
                       >
                         +
@@ -300,11 +301,12 @@ export function LoanRingArea({
                         </div>
                         <div
                           style={{
-                            fontSize: 22,
+                            fontSize: 20,
                             fontWeight: 200,
                             color: "var(--text-muted)",
                             fontFamily: "var(--font)",
                             letterSpacing: "-0.03em",
+                            whiteSpace: "nowrap",
                           }}
                         >
                           {fShort(interest)}
