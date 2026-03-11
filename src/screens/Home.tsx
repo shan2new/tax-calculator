@@ -5,11 +5,13 @@ import { BrandMark } from "@/components/canvas/BrandMark";
 import { MiniRing } from "@/components/canvas/MiniRing";
 import { MiniTaxViz } from "@/components/canvas/MiniTaxViz";
 import { PressableCard } from "@/components/PressableCard";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Haptic } from "@/hooks/useHaptic";
 import { usePremiumPress } from "@/hooks/usePremiumPress";
 
 interface HomeScreenProps {
   dark: boolean;
+  onToggleTheme: () => void;
 }
 
 function getGreeting(): string {
@@ -21,12 +23,12 @@ function getGreeting(): string {
   return "Good evening";
 }
 
-export function HomeScreen({ dark }: Readonly<HomeScreenProps>) {
+export function HomeScreen({ dark, onToggleTheme }: Readonly<HomeScreenProps>) {
   const router = useRouter();
   const legalPress = usePremiumPress();
   const modules = [
-    { id: "/loans", title: "Loans", desc: "See what your money really costs", viz: <MiniRing dark={dark} /> },
     { id: "/tax", title: "Income Tax", desc: "Old vs New — find what saves more", viz: <MiniTaxViz dark={dark} /> },
+    { id: "/loans", title: "Loans", desc: "See what your money really costs", viz: <MiniRing dark={dark} /> },
   ];
 
   const greeting = getGreeting();
@@ -47,8 +49,12 @@ export function HomeScreen({ dark }: Readonly<HomeScreenProps>) {
           marginBottom: 52,
           opacity: 0,
           animation: "homeIn 0.8s cubic-bezier(0.16,1,0.3,1) 100ms forwards",
+          position: "relative",
         }}
       >
+        <div style={{ position: "absolute", top: 0, right: 0 }}>
+          <ThemeToggle dark={dark} onToggle={onToggleTheme} />
+        </div>
         <BrandMark dark={dark} />
         <div
           style={{

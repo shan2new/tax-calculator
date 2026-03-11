@@ -73,9 +73,10 @@ const LOAN_FAQS: Record<string, FAQItem[]> = {
 
 interface LoanFAQProps {
   loanType: string;
+  defaultOpen?: boolean;
 }
 
-export function LoanFAQ({ loanType }: LoanFAQProps) {
+export function LoanFAQ({ loanType, defaultOpen = false }: LoanFAQProps) {
   const extra = LOAN_FAQS[loanType] ?? [];
   const allFaqs = [...BASE_FAQS.slice(0, 4), ...extra];
 
@@ -95,26 +96,45 @@ export function LoanFAQ({ loanType }: LoanFAQProps) {
   return (
     <>
       <JsonLd data={jsonLdData} />
-      <section
+      <details
+        open={defaultOpen || undefined}
         style={{
-          marginTop: 32,
-          paddingTop: 24,
-          borderTop: "1px solid var(--border, rgba(255,255,255,0.08))",
+          marginTop: 24,
         }}
       >
-        <h2
+        <summary
           style={{
-            fontSize: 14,
-            fontWeight: 400,
-            color: "var(--text-primary, #e8e4de)",
-            letterSpacing: "-0.01em",
-            marginBottom: 16,
-            marginTop: 0,
+            cursor: "pointer",
+            listStyle: "none",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "4px 0",
           }}
         >
-          Frequently Asked Questions
-        </h2>
-        <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+          <h2
+            style={{
+              fontSize: 14,
+              fontWeight: 400,
+              color: "var(--text-primary, #e8e4de)",
+              letterSpacing: "-0.01em",
+              margin: 0,
+            }}
+          >
+            Frequently Asked Questions
+          </h2>
+          <span
+            style={{
+              flexShrink: 0,
+              fontSize: 14,
+              color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
+              transition: "transform 0.2s ease",
+            }}
+          >
+            ▾
+          </span>
+        </summary>
+        <div style={{ display: "flex", flexDirection: "column", gap: 0, marginTop: 12 }}>
           {allFaqs.map((faq, i) => (
             <details
               key={i}
@@ -165,7 +185,7 @@ export function LoanFAQ({ loanType }: LoanFAQProps) {
             </details>
           ))}
         </div>
-      </section>
+      </details>
     </>
   );
 }

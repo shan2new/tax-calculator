@@ -66,7 +66,7 @@ export function LoanControls({
         max={loanType.maxYr}
         step={1}
         sensitivity={LOAN_CONTROL_CONFIG.tenure.sensitivity}
-        format={(value) => `${value} ${value === 1 ? "yr" : "yrs"}`}
+        format={(value) => `${value} yr`}
         onVelocity={onVelocity}
         parseInput={(value) => Number.parseInt(value, 10)}
         onChange={onTenureChange}

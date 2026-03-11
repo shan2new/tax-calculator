@@ -30,7 +30,7 @@ export function RegimeBar({
                 : "scaleY(1)",
             transformOrigin: "center",
             transition:
-              "flex var(--motion-slow) var(--ease-premium), background var(--motion-medium) var(--ease-premium), transform var(--motion-medium) var(--ease-premium)",
+              "flex var(--motion-medium) var(--ease-premium), background var(--motion-medium) var(--ease-premium), transform var(--motion-medium) var(--ease-premium)",
           }}
         />
         <div
@@ -41,7 +41,7 @@ export function RegimeBar({
             transform: betterRegime === "old" ? `scaleY(${winnerScale.toFixed(3)})` : "scaleY(1)",
             transformOrigin: "center",
             transition:
-              "flex var(--motion-slow) var(--ease-premium), background var(--motion-medium) var(--ease-premium), transform var(--motion-medium) var(--ease-premium)",
+              "flex var(--motion-medium) var(--ease-premium), background var(--motion-medium) var(--ease-premium), transform var(--motion-medium) var(--ease-premium)",
           }}
         />
       </div>

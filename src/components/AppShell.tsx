@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { APP_MAX_CONTENT_WIDTH, APP_STORAGE_KEYS } from "@/lib/constants";
 import { ThemeProvider, useTheme } from "@/providers/ThemeProvider";
 import { Particles } from "@/components/canvas/Particles";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { WelcomeOverlay } from "@/screens/Welcome";
 
 function Shell({ children }: Readonly<{ children: ReactNode }>) {
@@ -42,7 +41,6 @@ function Shell({ children }: Readonly<{ children: ReactNode }>) {
       }}
     >
       <Particles intensity={0.4} dark={dark} />
-      <ThemeToggle dark={dark} onToggle={toggle} />
 
       {!welcomed && <WelcomeOverlay onAccept={handleAccept} />}
 

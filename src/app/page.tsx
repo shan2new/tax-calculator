@@ -25,8 +25,15 @@ export default function HomePage() {
   return (
     <>
       <HomePageClient />
-      <div style={{ padding: "0 24px 40px" }}>
-        <SEOFooter />
+      <div style={{ padding: "0 24px 40px", marginTop: 80 }}>
+        <div
+          style={{
+            borderTop: "1px solid var(--border, rgba(255,255,255,0.08))",
+            paddingTop: 24,
+          }}
+        >
+          <SEOFooter />
+        </div>
       </div>
     </>
   );

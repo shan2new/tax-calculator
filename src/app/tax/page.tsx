@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { NavHeader } from "@/components/NavHeader";
 import { TaxModule } from "@/modules/IncomeTax";
 import { TaxSlabTable } from "@/components/seo/TaxSlabTable";
@@ -37,41 +38,40 @@ const breadcrumb = {
   ],
 };
 
+const pillStyle: React.CSSProperties = {
+  fontSize: 12,
+  color: "var(--text-muted, rgba(255,255,255,0.5))",
+  textDecoration: "none",
+  padding: "8px 16px",
+  borderRadius: 8,
+  border: "1px solid var(--border, rgba(255,255,255,0.08))",
+  background: "var(--card-bg, rgba(255,255,255,0.03))",
+  letterSpacing: "0.01em",
+  fontWeight: 300,
+};
+
 export default function TaxPage() {
   return (
     <>
       <JsonLd data={breadcrumb} />
-      <NavHeader title="Income Tax" />
-      <div style={{ padding: "0 24px 8px", paddingTop: 12 }}>
-        <h1
-          style={{
-            fontSize: 20,
-            fontWeight: 200,
-            color: "var(--text-primary)",
-            letterSpacing: "-0.03em",
-            margin: "0 0 4px 0",
-            lineHeight: 1.2,
-            fontFamily: "var(--font)",
-          }}
-        >
-          Income Tax Calculator
-        </h1>
-        <p
-          style={{
-            fontSize: 12,
-            color: "var(--text-muted)",
-            margin: 0,
-            fontWeight: 300,
-          }}
-        >
-          Old vs New Regime — FY 2025-26
-        </p>
-      </div>
+      <NavHeader title="Income Tax Calculator" subtitle="Old vs New Regime — FY 2025-26" />
       <TaxModule />
-      <div style={{ padding: "0 24px 40px" }}>
+
+      {/* SEO Content Zone */}
+      <div style={{
+        padding: "0 24px 40px",
+        fontSize: "0.9em",
+        color: "var(--text-muted)",
+        marginTop: 32,
+        borderTop: "1px solid var(--border, rgba(255,255,255,0.08))",
+        paddingTop: 8,
+      }}>
         <TaxSlabTable />
         <TaxContent />
         <TaxFAQ />
+        <div style={{ display: "flex", justifyContent: "center", marginTop: 28 }}>
+          <Link href="/loans" style={pillStyle}>EMI Calculator</Link>
+        </div>
         <SEOFooter showLoans={true} showTax={false} />
       </div>
     </>

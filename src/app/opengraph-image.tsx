@@ -34,6 +34,9 @@ export default function Image() {
         </div>
         <div
           style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
             fontSize: 52,
             fontWeight: 200,
             color: "#E8E4DE",
@@ -43,9 +46,8 @@ export default function Image() {
             marginBottom: 20,
           }}
         >
-          Financial clarity,
-          <br />
-          one decision at a time.
+          <span>Financial clarity,</span>
+          <span>one decision at a time.</span>
         </div>
         <div
           style={{

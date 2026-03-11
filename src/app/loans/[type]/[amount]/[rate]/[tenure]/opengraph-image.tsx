@@ -58,7 +58,7 @@ export default async function Image({ params }: { params: Promise<PageParams> })
             marginBottom: 20,
           }}
         >
-          CLAROS · {typeLabel.toUpperCase()}
+          {`CLAROS · ${typeLabel.toUpperCase()}`}
         </div>
         <div
           style={{
@@ -90,7 +90,7 @@ export default async function Image({ params }: { params: Promise<PageParams> })
             marginBottom: 32,
           }}
         >
-          {amountStr} {typeLabel} · {rate}% · {tenure} Years
+          {`${amountStr} ${typeLabel} · ${rate}% · ${tenure} Years`}
         </div>
         {interestPct > 0 && (
           <div
@@ -100,7 +100,7 @@ export default async function Image({ params }: { params: Promise<PageParams> })
               fontWeight: 300,
             }}
           >
-            {interestPct}% of total payments goes to interest
+            {`${interestPct}% of total payments goes to interest`}
           </div>
         )}
         <div

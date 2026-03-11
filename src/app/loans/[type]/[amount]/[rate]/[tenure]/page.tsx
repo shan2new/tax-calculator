@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { NavHeader } from "@/components/NavHeader";
 import { LoanModule } from "@/modules/LoanCalculator";
 import { AmortizationTable } from "@/components/seo/AmortizationTable";
@@ -91,6 +92,18 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   };
 }
 
+const pillStyle: React.CSSProperties = {
+  fontSize: 12,
+  color: "var(--text-muted, rgba(255,255,255,0.5))",
+  textDecoration: "none",
+  padding: "8px 16px",
+  borderRadius: 8,
+  border: "1px solid var(--border, rgba(255,255,255,0.08))",
+  background: "var(--card-bg, rgba(255,255,255,0.03))",
+  letterSpacing: "0.01em",
+  fontWeight: 300,
+};
+
 export default async function LoanDetailPage({ params }: { params: Promise<PageParams> }) {
   const p = await params;
   const config = parseLoanTypeSlug(p.type);
@@ -133,40 +146,12 @@ export default async function LoanDetailPage({ params }: { params: Promise<PageP
   return (
     <>
       <JsonLd data={breadcrumb} />
-      <NavHeader title="Loans" />
+      <NavHeader
+        title={`${amountStr} ${config.label} EMI`}
+        subtitle={`${emiStr}/mo · ${rate}% · ${tenure} yrs`}
+      />
 
-      <div style={{ padding: "0 24px 40px" }}>
-        <div style={{ paddingTop: 16, paddingBottom: 8 }}>
-          <h1
-            style={{
-              fontSize: 22,
-              fontWeight: 200,
-              color: "var(--text-primary)",
-              letterSpacing: "-0.03em",
-              margin: "0 0 8px 0",
-              lineHeight: 1.2,
-              fontFamily: "var(--font)",
-            }}
-          >
-            {amountStr} {config.label} EMI at {rate}% for {tenure} Years
-          </h1>
-          <p
-            style={{
-              fontSize: 13,
-              color: "var(--text-muted)",
-              margin: 0,
-              lineHeight: 1.5,
-              fontWeight: 300,
-            }}
-          >
-            Your monthly EMI is <strong style={{ color: "var(--text-primary)", fontWeight: 400 }}>{emiStr}</strong>.
-            {" "}Over {tenure} years, you'll pay{" "}
-            {interest >= 1e7
-              ? `₹${(interest / 1e7).toFixed(1)} Cr`
-              : `₹${(interest / 1e5).toFixed(1)}L`}{" "}
-            in interest — use the calculator below to adjust and explore.
-          </p>
-        </div>
+      <div style={{ padding: "0 24px 24px" }}>
 
         <LoanInsights
           amount={amount}
@@ -181,6 +166,19 @@ export default async function LoanDetailPage({ params }: { params: Promise<PageP
         />
       </div>
 
+      <p
+        style={{
+          fontSize: 11,
+          color: "var(--text-muted-faint)",
+          letterSpacing: "0.06em",
+          textTransform: "uppercase",
+          margin: "0 0 8px",
+          padding: "0 24px",
+        }}
+      >
+        Adjust &amp; Recalculate
+      </p>
+
       <LoanModule
         initialType={config.typeIndex}
         initialAmount={amount}
@@ -188,21 +186,74 @@ export default async function LoanDetailPage({ params }: { params: Promise<PageP
         initialTenure={tenure}
       />
 
-      <div style={{ padding: "0 24px 40px" }}>
-        <section style={{ marginTop: 24 }}>
-          <h2
+      {/* Tool Terminus */}
+      <div style={{ padding: "0 24px" }}>
+        <p
+          style={{
+            fontSize: 11,
+            color: "var(--text-muted-faint)",
+            lineHeight: 1.6,
+            margin: "16px 0 0",
+          }}
+        >
+          Calculations are indicative. Actual EMI may vary based on lender policies, processing fees, and GST.
+        </p>
+        <hr style={{ border: "none", borderTop: "1px solid var(--border, rgba(255,255,255,0.08))", margin: "20px 0 16px" }} />
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          <Link href="/loans" style={pillStyle}>Try a different amount</Link>
+          <Link href="/tax" style={pillStyle}>Income Tax Calculator</Link>
+        </div>
+      </div>
+
+      {/* SEO Content Zone */}
+      <div style={{
+        padding: "0 24px 40px",
+        fontSize: "0.9em",
+        color: "var(--text-muted)",
+        marginTop: 32,
+        borderTop: "1px solid var(--border, rgba(255,255,255,0.08))",
+        paddingTop: 8,
+      }}>
+        <details
+          open
+          style={{ marginTop: 24 }}
+        >
+          <summary
             style={{
-              fontSize: 14,
-              fontWeight: 400,
-              color: "var(--text-primary)",
-              letterSpacing: "-0.01em",
-              margin: "0 0 12px 0",
+              cursor: "pointer",
+              listStyle: "none",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "4px 0",
             }}
           >
-            Year-by-Year Amortization Schedule
-          </h2>
-          <AmortizationTable years={years} crossoverIndex={crossoverIndex} />
-        </section>
+            <h2
+              style={{
+                fontSize: 14,
+                fontWeight: 400,
+                color: "var(--text-primary, #e8e4de)",
+                letterSpacing: "-0.01em",
+                margin: 0,
+              }}
+            >
+              Year-by-Year Amortization Schedule
+            </h2>
+            <span
+              style={{
+                flexShrink: 0,
+                fontSize: 14,
+                color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
+                transition: "transform 0.2s ease",
+              }}
+            >
+              ▾
+            </span>
+          </summary>
+          <div style={{ marginTop: 12 }}>
+            <AmortizationTable years={years} crossoverIndex={crossoverIndex} />
+          </div>
+        </details>
 
         <LoanContent />
         <LoanFAQ loanType={p.type} />
@@ -213,19 +264,6 @@ export default async function LoanDetailPage({ params }: { params: Promise<PageP
           currentTenure={tenure.toString()}
         />
         <SEOFooter showLoans={false} showTax={true} />
-
-        <p
-          style={{
-            marginTop: 32,
-            fontSize: 11,
-            color: "var(--text-muted-faint)",
-            lineHeight: 1.6,
-            textAlign: "center",
-          }}
-        >
-          Calculations are indicative only. Actual EMI may vary based on lender policies, processing fees, and GST.
-          Not financial advice. · <a href={canonical} style={{ color: "inherit" }}>{canonical}</a>
-        </p>
       </div>
     </>
   );

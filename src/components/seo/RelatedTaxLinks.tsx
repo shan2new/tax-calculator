@@ -12,6 +12,15 @@ function formatIncomeLabel(slug: string): string {
   return slug;
 }
 
+const linkStyle: React.CSSProperties = {
+  fontSize: 11,
+  color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
+  textDecoration: "none",
+  lineHeight: 1.5,
+  fontWeight: 300,
+  letterSpacing: "0.01em",
+};
+
 export function RelatedTaxLinks({ currentIncome, fyYear }: RelatedTaxLinksProps) {
   const currentIdx = TAX_INCOMES.indexOf(currentIncome);
   const nearby = TAX_INCOMES.filter((_, i) => {
@@ -25,38 +34,30 @@ export function RelatedTaxLinks({ currentIncome, fyYear }: RelatedTaxLinksProps)
     <nav
       aria-label="Related tax calculations"
       style={{
-        marginTop: 32,
-        paddingTop: 24,
-        borderTop: "1px solid var(--border, rgba(255,255,255,0.08))",
+        marginTop: 24,
       }}
     >
-      <h3
+      <div
         style={{
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: 400,
-          color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
+          color: "var(--text-muted-faint, rgba(255,255,255,0.25))",
           letterSpacing: "0.08em",
           textTransform: "uppercase",
-          margin: "0 0 10px 0",
+          marginBottom: 10,
         }}
       >
-        See also
-      </h3>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        Explore More
+      </div>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "6px 12px",
+        }}
+      >
         {nearby.map((income) => (
-          <Link
-            key={income}
-            href={`/tax/${fyYear}/${income}`}
-            style={{
-              fontSize: 12,
-              color: "var(--text-muted, rgba(255,255,255,0.5))",
-              textDecoration: "none",
-              padding: "5px 10px",
-              borderRadius: 6,
-              border: "1px solid var(--border, rgba(255,255,255,0.08))",
-              background: "var(--card-bg, rgba(255,255,255,0.03))",
-            }}
-          >
+          <Link key={income} href={`/tax/${fyYear}/${income}`} style={linkStyle}>
             {formatIncomeLabel(income)}
           </Link>
         ))}

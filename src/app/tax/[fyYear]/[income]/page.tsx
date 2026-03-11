@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { NavHeader } from "@/components/NavHeader";
 import { TaxModule } from "@/modules/IncomeTax";
 import { TaxInsights } from "@/components/seo/TaxInsights";
@@ -74,6 +75,18 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
 
 const DEFAULT_DEDUCTIONS = 200000;
 
+const pillStyle: React.CSSProperties = {
+  fontSize: 12,
+  color: "var(--text-muted, rgba(255,255,255,0.5))",
+  textDecoration: "none",
+  padding: "8px 16px",
+  borderRadius: 8,
+  border: "1px solid var(--border, rgba(255,255,255,0.08))",
+  background: "var(--card-bg, rgba(255,255,255,0.03))",
+  letterSpacing: "0.01em",
+  fontWeight: 300,
+};
+
 export default async function TaxDetailPage({ params }: { params: Promise<PageParams> }) {
   const p = await params;
   const income = parseIncomeSlug(p.income);
@@ -115,42 +128,14 @@ export default async function TaxDetailPage({ params }: { params: Promise<PagePa
   return (
     <>
       <JsonLd data={breadcrumb} />
-      <NavHeader title="Income Tax" />
+      <NavHeader
+        title={`Income Tax on ${incomeLabel} Salary`}
+        subtitle={betterRegime === "same"
+          ? `Both regimes equal · ${fy}`
+          : `${betterRegime === "new" ? "New" : "Old"} regime saves more · ${fy}`}
+      />
 
-      <div style={{ padding: "0 24px 40px" }}>
-        <div style={{ paddingTop: 16, paddingBottom: 8 }}>
-          <h1
-            style={{
-              fontSize: 22,
-              fontWeight: 200,
-              color: "var(--text-primary)",
-              letterSpacing: "-0.03em",
-              margin: "0 0 8px 0",
-              lineHeight: 1.2,
-              fontFamily: "var(--font)",
-            }}
-          >
-            Income Tax on {incomeLabel} Salary — {fy}
-          </h1>
-          <p
-            style={{
-              fontSize: 13,
-              color: "var(--text-muted)",
-              margin: 0,
-              lineHeight: 1.5,
-              fontWeight: 300,
-            }}
-          >
-            {betterRegime === "same"
-              ? `Both old and new regime result in the same tax for a ${incomeLabel} salary.`
-              : `The ${betterRegime} saves more tax for a ${incomeLabel} salary under ${fy}.`}{" "}
-            Your monthly take-home is approximately{" "}
-            <strong style={{ color: "var(--text-primary)", fontWeight: 400 }}>
-              ₹{takeHome.toLocaleString("en-IN")}
-            </strong>
-            . Adjust the calculator below to account for your deductions.
-          </p>
-        </div>
+      <div style={{ padding: "0 24px 24px" }}>
 
         <TaxInsights
           income={income}
@@ -164,27 +149,54 @@ export default async function TaxDetailPage({ params }: { params: Promise<PagePa
         />
       </div>
 
+      <p
+        style={{
+          fontSize: 11,
+          color: "var(--text-muted-faint)",
+          letterSpacing: "0.06em",
+          textTransform: "uppercase",
+          margin: "0 0 8px",
+          padding: "0 24px",
+        }}
+      >
+        Adjust &amp; Recalculate
+      </p>
+
       <TaxModule initialIncome={income} initialDeductions={DEFAULT_DEDUCTIONS} />
 
-      <div style={{ padding: "0 24px 40px" }}>
-        <TaxSlabTable />
+      {/* Tool Terminus */}
+      <div style={{ padding: "0 24px" }}>
+        <p
+          style={{
+            fontSize: 11,
+            color: "var(--text-muted-faint)",
+            lineHeight: 1.6,
+            margin: "16px 0 0",
+          }}
+        >
+          Calculations are indicative for FY 2025-26. Excludes surcharge above ₹50L, special incomes, and state levies. Not tax advice.
+        </p>
+        <hr style={{ border: "none", borderTop: "1px solid var(--border, rgba(255,255,255,0.08))", margin: "20px 0 16px" }} />
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          <Link href="/tax" style={pillStyle}>Try a different salary</Link>
+          <Link href="/loans" style={pillStyle}>EMI Calculator</Link>
+        </div>
+      </div>
+
+      {/* SEO Content Zone */}
+      <div style={{
+        padding: "0 24px 40px",
+        fontSize: "0.9em",
+        color: "var(--text-muted)",
+        marginTop: 32,
+        borderTop: "1px solid var(--border, rgba(255,255,255,0.08))",
+        paddingTop: 8,
+      }}>
+        <TaxSlabTable defaultOpen />
         <TaxContent />
         <TaxFAQ />
         <RelatedTaxLinks currentIncome={p.income} fyYear={p.fyYear} />
         <SEOFooter showLoans={true} showTax={false} />
-
-        <p
-          style={{
-            marginTop: 32,
-            fontSize: 11,
-            color: "var(--text-muted-faint)",
-            lineHeight: 1.6,
-            textAlign: "center",
-          }}
-        >
-          Calculations are indicative for FY 2025-26. Excludes surcharge above ₹50L, special incomes, and state levies.
-          Not tax advice. · <a href={canonical} style={{ color: "inherit" }}>{canonical}</a>
-        </p>
       </div>
     </>
   );

@@ -1,10 +1,8 @@
 "use client";
 
 import { SmoothNumber } from "@/components/SmoothNumber";
-import { PaginationDots } from "@/components/ui";
 import { Haptic } from "@/hooks/useHaptic";
 import { usePremiumPress } from "@/hooks/usePremiumPress";
-import { TAX_HERO_VIEW_COUNT } from "@/lib/constants";
 import { fINR, fShort } from "@/lib/format";
 
 interface TaxHeroProps {
@@ -184,9 +182,6 @@ export function TaxHero({
         ) : null}
       </div>
 
-      <div style={{ marginTop: 16 }}>
-        <PaginationDots count={TAX_HERO_VIEW_COUNT} activeIndex={heroView} />
-      </div>
     </div>
   );
 }

@@ -1,16 +1,22 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Haptic } from "@/hooks/useHaptic";
 import { useCollapsible } from "@/hooks/useCollapsible";
 import { useViewCycler } from "@/hooks/useViewCycler";
 import {
   SCRUB_TICK_PULSE_MS,
+  SHARE_TOAST_MS,
   TAX_HERO_VIEW_COUNT,
   VERDICT_PULSE_MS,
 } from "@/lib/constants";
 import { calcTaxNew, calcTaxOld } from "@/lib/calc";
+import { fINR, fShort } from "@/lib/format";
+import { buildTaxShareCardBlob, buildTaxShareUrl } from "@/lib/share-card";
+import { useTheme } from "@/providers/ThemeProvider";
 import { RegimeBar } from "@/modules/tax/RegimeBar";
 import { SlabBreakdown } from "@/modules/tax/SlabBreakdown";
+import { TaxActions } from "@/modules/tax/TaxActions";
 import { TaxControls } from "@/modules/tax/TaxControls";
 import { TaxDisclaimer } from "@/modules/tax/TaxDisclaimer";
 import { TaxHero } from "@/modules/tax/TaxHero";
@@ -21,11 +27,13 @@ interface TaxModuleProps {
 }
 
 export function TaxModule({ initialIncome = 1500000, initialDeductions = 200000 }: TaxModuleProps = {}) {
+  const { dark } = useTheme();
   const [income, setIncome] = useState(initialIncome);
   const [deductions, setDeductions] = useState(initialDeductions);
   const [velocity, setVelocity] = useState(0);
   const [tickPulse, setTickPulse] = useState(false);
   const [verdictPulse, setVerdictPulse] = useState(false);
+  const [shareVisible, setShareVisible] = useState(false);
   const tickPulseTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const slabs = useCollapsible();
@@ -48,7 +56,8 @@ export function TaxModule({ initialIncome = 1500000, initialDeductions = 200000 
   const takeHome = useMemo(() => (income > 0 ? Math.round((income - bestTax) / 12) : 0), [bestTax, income]);
   const effectiveRate = useMemo(() => (income > 0 ? (bestTax / income) * 100 : 0), [bestTax, income]);
   const scrubEnergy = Math.min(1, velocity / 18);
-  const winnerScale = 1 + scrubEnergy * 0.08 + (verdictPulse || tickPulse ? 0.1 : 0);
+  const pulseBoost = verdictPulse || tickPulse ? 0.1 : 0;
+  const winnerScale = 1 + Math.max(scrubEnergy * 0.08, pulseBoost);
 
   const fireTick = useCallback(() => {
     setTickPulse(true);
@@ -72,14 +81,57 @@ export function TaxModule({ initialIncome = 1500000, initialDeductions = 200000 
     []
   );
 
+  const handleShare = useCallback(async () => {
+    Haptic.medium();
+    const blob = await buildTaxShareCardBlob({
+      dark,
+      income,
+      deductions,
+      totalNew,
+      totalOld,
+      takeHome,
+      effectiveRate,
+      betterRegime,
+      savings,
+    });
+    if (!blob) return;
+
+    const file = new File([blob], "claros-tax.png", { type: "image/png" });
+    const shareUrl = buildTaxShareUrl(income);
+    const regimeLabel = betterRegime === "new" ? "New" : betterRegime === "old" ? "Old" : "Equal";
+
+    if (navigator.share && navigator.canShare?.({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: `Tax on ${fShort(income)} — ${regimeLabel} regime`,
+          text: `Take-home: ${fINR(takeHome)}/mo · ${effectiveRate.toFixed(1)}% effective\n${shareUrl}`,
+          url: shareUrl,
+        });
+      } catch {
+        // Share cancelled.
+      }
+      return;
+    }
+
+    const anchor = document.createElement("a");
+    anchor.href = URL.createObjectURL(blob);
+    anchor.download = "claros-tax.png";
+    anchor.click();
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setShareVisible(true);
+      globalThis.setTimeout(() => setShareVisible(false), SHARE_TOAST_MS);
+    } catch {
+      // Clipboard not available.
+    } finally {
+      URL.revokeObjectURL(anchor.href);
+    }
+  }, [betterRegime, dark, deductions, effectiveRate, income, savings, takeHome, totalNew, totalOld]);
+
   return (
     <div>
-      <div style={{ textAlign: "center", padding: "8px 0 20px" }}>
-        <span style={{ fontSize: 11, color: "var(--text-muted-faint)", letterSpacing: "0.08em" }}>
-          FY 2025–26
-        </span>
-      </div>
-
       <TaxHero
         heroView={heroView}
         displayHeroView={displayHeroView}
@@ -103,6 +155,15 @@ export function TaxModule({ initialIncome = 1500000, initialDeductions = 200000 
         totalOld={totalOld}
         betterRegime={betterRegime}
         winnerScale={winnerScale}
+      />
+
+      <TaxActions
+        heroView={heroView}
+        shareVisible={shareVisible}
+        onShare={(event) => {
+          event.stopPropagation();
+          void handleShare();
+        }}
       />
 
       <TaxControls

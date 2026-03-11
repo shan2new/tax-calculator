@@ -60,7 +60,7 @@ export function CollapsibleSection({
             color: "var(--text-muted-faint)",
             transform: open ? "rotate(180deg)" : "none",
             transition:
-              "transform var(--motion-slow) var(--ease-premium), color var(--motion-medium) var(--ease-premium)",
+              "transform var(--motion-medium) var(--ease-premium), color var(--motion-medium) var(--ease-premium)",
             display: "inline-block",
           }}
         >

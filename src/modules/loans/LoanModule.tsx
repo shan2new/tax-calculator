@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 import { Haptic } from "@/hooks/useHaptic";
 import { useCollapsible } from "@/hooks/useCollapsible";
 import { useViewCycler } from "@/hooks/useViewCycler";
-import { LOAN_VIEW_COUNT, SHARE_TOAST_MS } from "@/lib/constants";
+import { LOAN_VIEW_COUNT, SHARE_TOAST_MS, VIEW_SWAP_DELAY_MS } from "@/lib/constants";
 import { LOAN_TYPES, emiCalc, generateYearlyAmortization } from "@/lib/calc";
 import { useTheme } from "@/providers/ThemeProvider";
 import { buildLoanShareCardBlob, buildLoanShareUrl } from "@/lib/share-card";
@@ -89,8 +89,11 @@ export function LoanModule({
     setAmount(nextType.amt);
     setRate(nextType.rate);
     setTenure(nextType.yr);
-    setComparing(false);
-    setPinned(null);
+    // Delay clearing compare state so ring animation finishes before compare overlay disappears
+    globalThis.setTimeout(() => {
+      setComparing(false);
+      setPinned(null);
+    }, VIEW_SWAP_DELAY_MS);
   }, [activeTypeIndex]);
 
   const cycleRingView = useCallback(() => {

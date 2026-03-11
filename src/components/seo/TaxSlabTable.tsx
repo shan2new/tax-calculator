@@ -43,150 +43,172 @@ const tdStyle: React.CSSProperties = {
   fontWeight: 300,
 };
 
-export function TaxSlabTable() {
+const summaryStyle: React.CSSProperties = {
+  cursor: "pointer",
+  listStyle: "none",
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: "4px 0",
+};
+
+const chevronStyle: React.CSSProperties = {
+  flexShrink: 0,
+  fontSize: 14,
+  color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
+  transition: "transform 0.2s ease",
+};
+
+interface TaxSlabTableProps {
+  defaultOpen?: boolean;
+}
+
+export function TaxSlabTable({ defaultOpen = false }: TaxSlabTableProps) {
   return (
-    <section
+    <details
+      open={defaultOpen || undefined}
       style={{
-        marginTop: 32,
-        paddingTop: 24,
-        borderTop: "1px solid var(--border, rgba(255,255,255,0.08))",
-        display: "flex",
-        flexDirection: "column",
-        gap: 24,
+        marginTop: 24,
       }}
     >
-      <div>
+      <summary style={summaryStyle}>
         <h2
           style={{
             fontSize: 14,
             fontWeight: 400,
             color: "var(--text-primary, #e8e4de)",
             letterSpacing: "-0.01em",
-            margin: "0 0 4px 0",
+            margin: 0,
           }}
         >
           Income Tax Slabs for FY 2025-26
         </h2>
+        <span style={chevronStyle}>▾</span>
+      </summary>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 24, marginTop: 12 }}>
         <p
           style={{
             fontSize: 11,
             color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
-            margin: "0 0 16px 0",
+            margin: 0,
           }}
         >
           AY 2026-27
         </p>
 
-        <h3
-          style={{
-            fontSize: 12,
-            fontWeight: 400,
-            color: "var(--text-muted, rgba(255,255,255,0.5))",
-            letterSpacing: "0.04em",
-            textTransform: "uppercase",
-            margin: "0 0 8px 0",
-          }}
-        >
-          New Tax Regime (Default)
-        </h3>
-        <table style={tableStyle} aria-label="New tax regime slabs FY 2025-26">
-          <thead>
-            <tr>
-              <th style={thStyle}>Income Slab</th>
-              <th style={{ ...thStyle, textAlign: "right" }}>Tax Rate</th>
-            </tr>
-          </thead>
-          <tbody>
-            {NEW_SLABS.map((slab, i) => (
-              <tr key={i}>
-                <td style={tdStyle}>
-                  {slab.upper === Infinity
-                    ? `Above ${fINR(slab.lower)}`
-                    : `${fINR(slab.lower)} – ${fINR(slab.upper)}`}
-                </td>
-                <td
-                  style={{
-                    ...tdStyle,
-                    textAlign: "right",
-                    color:
-                      slab.rate === "Nil"
-                        ? "var(--text-positive, #a0dcb4)"
-                        : "var(--text-muted, rgba(255,255,255,0.5))",
-                  }}
-                >
-                  {slab.rate}
-                </td>
+        <div>
+          <h3
+            style={{
+              fontSize: 12,
+              fontWeight: 400,
+              color: "var(--text-muted, rgba(255,255,255,0.5))",
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
+              margin: "0 0 8px 0",
+            }}
+          >
+            New Tax Regime (Default)
+          </h3>
+          <table style={tableStyle} aria-label="New tax regime slabs FY 2025-26">
+            <thead>
+              <tr>
+                <th style={thStyle}>Income Slab</th>
+                <th style={{ ...thStyle, textAlign: "right" }}>Tax Rate</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        <p
-          style={{
-            fontSize: 11,
-            color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
-            marginTop: 8,
-            lineHeight: 1.6,
-          }}
-        >
-          Standard deduction: ₹75,000 · Section 87A rebate: zero tax if income ≤ ₹12L (₹12.75L with standard deduction)
-        </p>
-      </div>
+            </thead>
+            <tbody>
+              {NEW_SLABS.map((slab, i) => (
+                <tr key={i}>
+                  <td style={tdStyle}>
+                    {slab.upper === Infinity
+                      ? `Above ${fINR(slab.lower)}`
+                      : `${fINR(slab.lower)} – ${fINR(slab.upper)}`}
+                  </td>
+                  <td
+                    style={{
+                      ...tdStyle,
+                      textAlign: "right",
+                      color:
+                        slab.rate === "Nil"
+                          ? "var(--text-positive, #a0dcb4)"
+                          : "var(--text-muted, rgba(255,255,255,0.5))",
+                    }}
+                  >
+                    {slab.rate}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p
+            style={{
+              fontSize: 11,
+              color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
+              marginTop: 8,
+              lineHeight: 1.6,
+            }}
+          >
+            Standard deduction: ₹75,000 · Section 87A rebate: zero tax if income ≤ ₹12L (₹12.75L with standard deduction)
+          </p>
+        </div>
 
-      <div>
-        <h3
-          style={{
-            fontSize: 12,
-            fontWeight: 400,
-            color: "var(--text-muted, rgba(255,255,255,0.5))",
-            letterSpacing: "0.04em",
-            textTransform: "uppercase",
-            margin: "0 0 8px 0",
-          }}
-        >
-          Old Tax Regime
-        </h3>
-        <table style={tableStyle} aria-label="Old tax regime slabs FY 2025-26">
-          <thead>
-            <tr>
-              <th style={thStyle}>Income Slab</th>
-              <th style={{ ...thStyle, textAlign: "right" }}>Tax Rate</th>
-            </tr>
-          </thead>
-          <tbody>
-            {OLD_SLABS.map((slab, i) => (
-              <tr key={i}>
-                <td style={tdStyle}>
-                  {slab.upper === Infinity
-                    ? `Above ${fINR(slab.lower)}`
-                    : `${fINR(slab.lower)} – ${fINR(slab.upper)}`}
-                </td>
-                <td
-                  style={{
-                    ...tdStyle,
-                    textAlign: "right",
-                    color:
-                      slab.rate === "Nil"
-                        ? "var(--text-positive, #a0dcb4)"
-                        : "var(--text-muted, rgba(255,255,255,0.5))",
-                  }}
-                >
-                  {slab.rate}
-                </td>
+        <div>
+          <h3
+            style={{
+              fontSize: 12,
+              fontWeight: 400,
+              color: "var(--text-muted, rgba(255,255,255,0.5))",
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
+              margin: "0 0 8px 0",
+            }}
+          >
+            Old Tax Regime
+          </h3>
+          <table style={tableStyle} aria-label="Old tax regime slabs FY 2025-26">
+            <thead>
+              <tr>
+                <th style={thStyle}>Income Slab</th>
+                <th style={{ ...thStyle, textAlign: "right" }}>Tax Rate</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-        <p
-          style={{
-            fontSize: 11,
-            color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
-            marginTop: 8,
-            lineHeight: 1.6,
-          }}
-        >
-          Standard deduction: ₹50,000 · Eligible for 80C (₹1.5L), 80D, HRA, LTA, Section 24(b), NPS 80CCD(1B)
-        </p>
+            </thead>
+            <tbody>
+              {OLD_SLABS.map((slab, i) => (
+                <tr key={i}>
+                  <td style={tdStyle}>
+                    {slab.upper === Infinity
+                      ? `Above ${fINR(slab.lower)}`
+                      : `${fINR(slab.lower)} – ${fINR(slab.upper)}`}
+                  </td>
+                  <td
+                    style={{
+                      ...tdStyle,
+                      textAlign: "right",
+                      color:
+                        slab.rate === "Nil"
+                          ? "var(--text-positive, #a0dcb4)"
+                          : "var(--text-muted, rgba(255,255,255,0.5))",
+                    }}
+                  >
+                    {slab.rate}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p
+            style={{
+              fontSize: 11,
+              color: "var(--text-muted-faint, rgba(255,255,255,0.3))",
+              marginTop: 8,
+              lineHeight: 1.6,
+            }}
+          >
+            Standard deduction: ₹50,000 · Eligible for 80C (₹1.5L), 80D, HRA, LTA, Section 24(b), NPS 80CCD(1B)
+          </p>
+        </div>
       </div>
-    </section>
+    </details>
   );
 }

@@ -4,7 +4,9 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRipples } from "@/hooks/useRipples";
 import { Haptic } from "@/hooks/useHaptic";
 import {
-  MOMENTUM_DECAY_PER_FRAME,
+  MOMENTUM_DECAY_BASE,
+  MOMENTUM_DECAY_FAST,
+  MOMENTUM_VEL_KNEE,
   MOMENTUM_MIN_VELOCITY,
   SCRUB_INTENT_PX,
   SCRUB_RELEASE_FLASH_MS,
@@ -12,7 +14,7 @@ import {
   SETTLE_B,
   SETTLE_K,
 } from "@/lib/constants";
-import { toINRCommas, parseINRInput, humanHint } from "@/lib/format";
+import { toINRCommas, parseINRInput, humanHint, fINR } from "@/lib/format";
 
 interface RipplesProps {
   rips: { id: number; x: number; y: number }[];
@@ -76,6 +78,7 @@ export function ScrubValue({
 }: Readonly<ScrubValueProps>) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
+  const [shakeError, setShakeError] = useState(false);
   const [scrubbing, setScrubbing] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [dotPulse, setDotPulse] = useState(false);
@@ -83,7 +86,10 @@ export function ScrubValue({
   const [dragEnergy, setDragEnergy] = useState(0);
   const [dragDirection, setDragDirection] = useState(0);
   const [releaseFlash, setReleaseFlash] = useState(false);
+  const [boundaryHit, setBoundaryHit] = useState<"min" | "max" | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const openDraftRef = useRef("");
+  const shakeTimeoutRef = useRef(0);
   const scrubR = useRef({
     active: false,
     momentum: false,
@@ -104,6 +110,8 @@ export function ScrubValue({
   const settleRef = useRef<number>(0);
   const pulseTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const releaseTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const boundaryTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const lastBoundaryRef = useRef<"min" | "max" | null>(null);
   const cRef = useRef<HTMLDivElement>(null);
   const { rips, add } = useRipples();
   const prevBucket = useRef(Math.floor((value - min) / (tickStep || 1)));
@@ -119,19 +127,24 @@ export function ScrubValue({
   const pct = ((clampRaw(displayValue) - min) / range) * 100;
 
   const parsedDraft = isAmount ? parseINRInput(draft) : Number.NaN;
-  const hint =
-    editing && isAmount && !Number.isNaN(parsedDraft) && parsedDraft > 0
-      ? humanHint(parsedDraft)
-      : "";
+  const hint = (() => {
+    if (!editing || !isAmount || Number.isNaN(parsedDraft) || parsedDraft <= 0) return "";
+    // Show complementary format: shorthand input → expanded, raw digits → compact
+    if (/\d\s*(?:cr|l)\s*$/i.test(draft)) return fINR(parsedDraft);
+    return humanHint(parsedDraft);
+  })();
 
   const getEdgeResistance = useCallback(
     (currentValue: number, direction: number) => {
       if (direction === 0) return 1;
       const distanceToEdge = direction > 0 ? max - currentValue : currentValue - min;
       const band = Math.max(range * 0.16, step * 8);
-      if (distanceToEdge <= 0) return 0.18;
+      if (distanceToEdge <= 0) return 0.12;
       if (distanceToEdge >= band) return 1;
-      return 0.35 + (distanceToEdge / band) * 0.65;
+      // Smooth cubic ease — feels like pushing into resistance, not a wall
+      const t = distanceToEdge / band;
+      const eased = t * t * (3 - 2 * t); // smoothstep
+      return 0.12 + eased * 0.88;
     },
     [max, min, range, step]
   );
@@ -182,6 +195,22 @@ export function ScrubValue({
     },
     [clamp, onChange]
   );
+
+  const fireBoundaryHit = useCallback(
+    (edge: "min" | "max") => {
+      if (lastBoundaryRef.current === edge) return; // don't re-fire same edge
+      lastBoundaryRef.current = edge;
+      Haptic.medium();
+      setBoundaryHit(edge);
+      globalThis.clearTimeout(boundaryTimeoutRef.current);
+      boundaryTimeoutRef.current = globalThis.setTimeout(() => setBoundaryHit(null), 280);
+    },
+    []
+  );
+
+  const clearBoundaryTracking = useCallback(() => {
+    lastBoundaryRef.current = null;
+  }, []);
 
   const applyAnimatedValue = useCallback(
     (nextRaw: number) => {
@@ -255,12 +284,58 @@ export function ScrubValue({
 
   const handleDraftChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
-    if (isAmount) {
-      const a = raw.replaceAll(/[^0-9.,crl\s]/gi, "");
-      setDraft(/[crl]/i.test(a) ? a : toINRCommas(a.replaceAll(",", "")));
-    } else {
+    if (!isAmount) {
       setDraft(raw);
+      return;
     }
+
+    // Detect shorthand: digits (with optional dot) followed by L or Cr
+    // e.g. "50L", "1.5Cr", "50 L" — but NOT bare letters like "abc"
+    if (/\d\s*(?:cr|l)\s*$/i.test(raw)) {
+      // Strip to digits, dots, and shorthand suffix only
+      const cleaned = raw.replaceAll(/[^0-9.crl]/gi, "");
+      // Extract numeric part (before L/Cr) and cap at 6 chars to prevent
+      // "50,00,000" + "L" → "5000000L" = 5e12 absurdity
+      const match = cleaned.match(/^([\d.]{0,6})\s*((?:cr|l))$/i);
+      if (match) {
+        setDraft(match[1] + match[2].toUpperCase().replace("CR", "Cr"));
+      } else {
+        setDraft(cleaned.slice(0, 9));
+      }
+      return;
+    }
+
+    // Cursor-aware comma formatting (digits-only mode)
+    const input = inputRef.current;
+    const cursorPos = input?.selectionStart ?? raw.length;
+
+    // Count digits before cursor in old string
+    const beforeCursor = raw.slice(0, cursorPos);
+    const digitsBefore = beforeCursor.replaceAll(/\D/g, "").length;
+
+    // Strip to digits only, cap at 10 digits to prevent absurd numbers
+    const digitsOnly = raw.replaceAll(/\D/g, "").slice(0, 10);
+    const formatted = toINRCommas(digitsOnly);
+    setDraft(formatted);
+
+    // Restore cursor after React flushes
+    requestAnimationFrame(() => {
+      if (!input) return;
+      let digits = 0;
+      let newPos = formatted.length;
+      if (digitsBefore === 0) {
+        newPos = 0;
+      } else {
+        for (let i = 0; i < formatted.length; i++) {
+          if (/\d/.test(formatted[i])) digits++;
+          if (digits >= digitsBefore) {
+            newPos = i + 1;
+            break;
+          }
+        }
+      }
+      input.setSelectionRange(newPos, newPos);
+    });
   };
 
   const applyMomentum = useCallback(
@@ -274,7 +349,12 @@ export function ScrubValue({
         const dt = Math.min(34, now - lastT);
         lastT = now;
 
-        const decay = Math.pow(MOMENTUM_DECAY_PER_FRAME, dt / 16.6667);
+        // Velocity-dependent decay: gentle at low speed, tighter at high speed
+        // This creates a natural deceleration curve like a ball on grass
+        const absV = Math.abs(v);
+        const blend = Math.min(absV / MOMENTUM_VEL_KNEE, 1);
+        const decayRate = MOMENTUM_DECAY_BASE * (1 - blend) + MOMENTUM_DECAY_FAST * blend;
+        const decay = Math.pow(decayRate, dt / 16.6667);
         v *= decay;
         if (Math.abs(v) < 0.01) {
           scrubR.current.momentum = false;
@@ -284,14 +364,22 @@ export function ScrubValue({
 
         const deltaPx = v * dt;
         const deltaVal = projectDelta(deltaPx, deltaPx, scrubR.current.target, false);
-        scrubR.current.target = clampRaw(scrubR.current.target + deltaVal);
+        const unclamped = scrubR.current.target + deltaVal;
+        scrubR.current.target = clampRaw(unclamped);
+
+        // Boundary hit during momentum: fire haptic and kill velocity
+        if (unclamped <= min || unclamped >= max) {
+          fireBoundaryHit(unclamped <= min ? "min" : "max");
+          v *= 0.15; // sharp deceleration at boundary
+        }
+
         commitValue(scrubR.current.target);
         startSettling();
         momentumRef.current = requestAnimationFrame(coast);
       };
       momentumRef.current = requestAnimationFrame(coast);
     },
-    [clampRaw, commitValue, projectDelta, startSettling]
+    [clampRaw, commitValue, fireBoundaryHit, min, max, projectDelta, startSettling]
   );
 
   const onDown = (e: React.PointerEvent) => {
@@ -335,15 +423,22 @@ export function ScrubValue({
       }
       (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
       setScrubbing(true);
+      Haptic.light(); // confirm scrub intent
     }
     s.moved = true;
 
     const deltaPx = e.clientX - s.lx;
     const deltaVal = projectDelta(deltaPx, totalDx, s.raw);
-    s.raw = clampRaw(s.raw + deltaVal);
+    const unclamped = s.raw + deltaVal;
+    s.raw = clampRaw(unclamped);
     s.target = s.raw;
     commitValue(s.target);
     startSettling();
+
+    // Boundary hit detection: fire when drag pushes past limits
+    if (unclamped <= min && deltaVal < 0) fireBoundaryHit("min");
+    else if (unclamped >= max && deltaVal > 0) fireBoundaryHit("max");
+    else if (s.raw > min && s.raw < max) clearBoundaryTracking();
 
     const now = performance.now();
     const dt = now - s.lt;
@@ -366,6 +461,7 @@ export function ScrubValue({
     setDragEnergy(0);
     setDragDirection(0);
     if (onVelocity) onVelocity(0);
+    clearBoundaryTracking();
     if (!s.moved) {
       openEditor();
       return;
@@ -382,6 +478,7 @@ export function ScrubValue({
       s.target < max &&
       Math.abs(s.vel) > MOMENTUM_MIN_VELOCITY
     ) {
+      Haptic.light(); // momentum release
       applyMomentum(s.vel, s.target);
       return;
     }
@@ -405,8 +502,7 @@ export function ScrubValue({
     if (editing && inputRef.current) {
       const input = inputRef.current;
       input.focus();
-      const end = input.value.length;
-      input.setSelectionRange(end, end);
+      input.select();
     }
   }, [editing]);
 
@@ -416,15 +512,26 @@ export function ScrubValue({
       stopSettling();
       globalThis.clearTimeout(pulseTimeoutRef.current);
       globalThis.clearTimeout(releaseTimeoutRef.current);
+      globalThis.clearTimeout(shakeTimeoutRef.current);
+      globalThis.clearTimeout(boundaryTimeoutRef.current);
     },
     [stopSettling]
   );
 
-  const commit = () => {
+  const commit = (fromBlur = false) => {
+    const trimmed = draft.trim();
+    if (trimmed === "" || trimmed === openDraftRef.current) {
+      setEditing(false);
+      setShakeError(false);
+      return;
+    }
+
     let p: number;
-    if (isAmount) p = parseINRInput(draft);
-    else p = parseInput ? parseInput(draft) : Number.parseFloat(draft.replaceAll(",", ""));
-    if (!Number.isNaN(p)) {
+    if (isAmount) p = parseINRInput(trimmed);
+    else p = parseInput ? parseInput(trimmed) : Number.parseFloat(trimmed.replaceAll(",", ""));
+
+    if (!Number.isNaN(p) && Number.isFinite(p)) {
+      // Clamp to valid range (don't reject out-of-range, just snap)
       const next = clamp(p);
       scrubR.current.target = next;
       scrubR.current.animated = next;
@@ -432,14 +539,35 @@ export function ScrubValue({
       setDisplayValue(next);
       stopSettling();
       onChange(next);
+      setEditing(false);
+      setShakeError(false);
+    } else if (fromBlur) {
+      setEditing(false);
+      setShakeError(false);
+    } else {
+      // Clear and re-trigger to allow rapid re-shakes
+      globalThis.clearTimeout(shakeTimeoutRef.current);
+      setShakeError(false);
+      requestAnimationFrame(() => {
+        setShakeError(true);
+        Haptic.light();
+        shakeTimeoutRef.current = window.setTimeout(() => setShakeError(false), 400);
+      });
     }
-    setEditing(false);
   };
 
   const nudgeValue = useCallback(
     (direction: number) => {
       const next = clamp(value + direction * step);
-      if (next === value) return;
+      if (next === value) {
+        // At boundary — fire boundary feedback
+        Haptic.medium();
+        setBoundaryHit(direction > 0 ? "max" : "min");
+        globalThis.clearTimeout(boundaryTimeoutRef.current);
+        boundaryTimeoutRef.current = globalThis.setTimeout(() => setBoundaryHit(null), 280);
+        return;
+      }
+      Haptic.light();
       scrubR.current.target = next;
       scrubR.current.animated = next;
       scrubR.current.committed = next;
@@ -462,13 +590,15 @@ export function ScrubValue({
   else if (hovered) trackColor = "var(--track-hover)";
 
   let dotSize = 0;
-  if (dotPulse) dotSize = 10;
+  if (boundaryHit) dotSize = 8;
+  else if (dotPulse) dotSize = 10;
   else if (editing) dotSize = 4;
   else if (scrubbing) dotSize = 5;
   else if (hovered) dotSize = 3;
 
   let dotShadow = "none";
-  if (dotPulse) dotShadow = "var(--glow-strong)";
+  if (boundaryHit) dotShadow = "var(--glow-strong)";
+  else if (dotPulse) dotShadow = "var(--glow-strong)";
   else if (editing || scrubbing) dotShadow = "var(--glow)";
 
   const dotTransition = dotPulse
@@ -484,9 +614,12 @@ export function ScrubValue({
   const valueText = scrubbing && scrubFormat ? scrubFormat(visibleValue) : format(visibleValue);
 
   const openEditor = useCallback(() => {
-    if (isAmount) setDraft(toINRCommas(String(Math.round(value))));
-    else if (typeof value === "number" && value % 1 !== 0) setDraft(value.toFixed(1));
-    else setDraft(String(Math.round(value)));
+    let initial: string;
+    if (isAmount) initial = toINRCommas(String(Math.round(value)));
+    else if (typeof value === "number" && value % 1 !== 0) initial = value.toFixed(1);
+    else initial = String(Math.round(value));
+    setDraft(initial);
+    openDraftRef.current = initial;
     setEditing(true);
   }, [isAmount, value]);
 
@@ -625,20 +758,25 @@ export function ScrubValue({
               transformOrigin: "right top",
               transition:
                 "opacity 0.28s cubic-bezier(0.16,1,0.3,1), transform 0.32s cubic-bezier(0.16,1,0.3,1)",
+              animation: shakeError ? "shake 0.3s ease" : "none",
               pointerEvents: editing ? "auto" : "none",
             }}
           >
             <input
               ref={inputRef}
               type="text"
-              inputMode={isAmount ? "numeric" : "decimal"}
+              inputMode={isAmount ? "text" : "decimal"}
               value={draft}
               onChange={handleDraftChange}
-              onBlur={commit}
-              onContextMenu={(e) => e.preventDefault()}
+              onBlur={() => commit(true)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") commit();
-                if (e.key === "Escape") setEditing(false);
+                if (e.key === "Enter") { e.preventDefault(); commit(false); }
+                if (e.key === "Escape") {
+                  e.preventDefault();
+                  setDraft(openDraftRef.current);
+                  setEditing(false);
+                  setShakeError(false);
+                }
               }}
               onClick={(e) => e.stopPropagation()}
               onMouseDown={(e) => e.stopPropagation()}
@@ -646,7 +784,9 @@ export function ScrubValue({
               style={{
                 background: "transparent",
                 border: "none",
-                borderBottom: "1px solid var(--border-strong)",
+                borderBottom: shakeError
+                  ? "1.5px solid var(--error, #e55)"
+                  : "1px solid var(--border-strong)",
                 color: "var(--text-primary)",
                 fontSize: 24,
                 fontWeight: 200,
@@ -685,10 +825,11 @@ export function ScrubValue({
       <div
         style={{
           marginTop: 10,
-          height: 2,
+          height: scrubbing ? 3 : 2,
           position: "relative",
-          borderRadius: 1,
+          borderRadius: 1.5,
           overflow: "hidden",
+          transition: "height 0.28s cubic-bezier(0.16,1,0.3,1)",
         }}
       >
         <div style={{ position: "absolute", inset: 0, background: "var(--track-bg)" }} />

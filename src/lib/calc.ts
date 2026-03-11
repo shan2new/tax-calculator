@@ -13,9 +13,9 @@ export interface LoanType {
 }
 
 export const LOAN_TYPES: LoanType[] = [
-  { id: "home", label: "Home", amt: 5000000, rate: 8.5, yr: 20, maxAmt: 50000000, minAmt: 100000, maxYr: 30, step: 100000, tickStep: 1000000 },
-  { id: "car", label: "Car", amt: 1000000, rate: 9.5, yr: 7, maxAmt: 5000000, minAmt: 100000, maxYr: 10, step: 50000, tickStep: 200000 },
   { id: "personal", label: "Personal", amt: 500000, rate: 12, yr: 5, maxAmt: 4000000, minAmt: 50000, maxYr: 7, step: 25000, tickStep: 100000 },
+  { id: "car", label: "Car", amt: 1000000, rate: 9.5, yr: 7, maxAmt: 5000000, minAmt: 100000, maxYr: 10, step: 50000, tickStep: 200000 },
+  { id: "home", label: "Home", amt: 5000000, rate: 8.5, yr: 20, maxAmt: 50000000, minAmt: 100000, maxYr: 30, step: 100000, tickStep: 1000000 },
   { id: "education", label: "Education", amt: 2000000, rate: 8, yr: 10, maxAmt: 10000000, minAmt: 100000, maxYr: 15, step: 100000, tickStep: 500000 },
 ];
 

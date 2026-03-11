@@ -59,7 +59,7 @@ export default async function Image({ params }: { params: Promise<PageParams> })
           CLAROS · INCOME TAX
         </div>
         {betterRegime && absSavings > 0 && (
-          <>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <div
               style={{
                 fontSize: 18,
@@ -68,7 +68,7 @@ export default async function Image({ params }: { params: Promise<PageParams> })
                 marginBottom: 8,
               }}
             >
-              {betterRegime} saves
+              {`${betterRegime} saves`}
             </div>
             <div
               style={{
@@ -82,7 +82,7 @@ export default async function Image({ params }: { params: Promise<PageParams> })
             >
               {savingsStr}
             </div>
-          </>
+          </div>
         )}
         <div
           style={{
@@ -92,7 +92,7 @@ export default async function Image({ params }: { params: Promise<PageParams> })
             marginBottom: 20,
           }}
         >
-          {incomeLabel} · {fy}
+          {`${incomeLabel} · ${fy}`}
         </div>
         <div
           style={{
@@ -101,7 +101,7 @@ export default async function Image({ params }: { params: Promise<PageParams> })
             fontWeight: 300,
           }}
         >
-          Monthly take-home: {takeHomeStr}
+          {`Monthly take-home: ${takeHomeStr}`}
         </div>
         <div
           style={{

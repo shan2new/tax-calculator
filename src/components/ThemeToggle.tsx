@@ -20,21 +20,16 @@ export function ThemeToggle({ dark, onToggle }: Readonly<ThemeToggleProps>) {
       }}
       aria-label="Toggle theme"
       style={{
-        position: "fixed",
-        top: "max(16px, env(safe-area-inset-top))",
-        right: 20,
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        width: 36,
+        height: 36,
+        borderRadius: 18,
         background: "var(--toggle-bg)",
         border: "1px solid var(--border)",
         cursor: "pointer",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 100,
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
+        flexShrink: 0,
         boxShadow: "var(--toggle-shadow)",
         transform: pressed
           ? "translateY(1px) scale(0.95)"

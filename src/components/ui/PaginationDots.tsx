@@ -17,14 +17,15 @@ export const PaginationDots = memo(function PaginationDots({
         <div
           key={`dot-${index}`}
           style={{
-            width: index === activeIndex ? 10 : 4,
+            width: 10,
             height: 4,
             borderRadius: 2,
             background: index === activeIndex ? "var(--text-muted-mid)" : "var(--text-muted-faint)",
             opacity: index === activeIndex ? 1 : 0.72,
-            transform: index === activeIndex ? "scaleX(1)" : "scaleX(0.92)",
+            transform: index === activeIndex ? "scaleX(1)" : "scaleX(0.4)",
+            transformOrigin: "center",
             transition:
-              "width var(--motion-medium) var(--ease-premium), background var(--motion-medium) var(--ease-premium), opacity var(--motion-medium) var(--ease-premium), transform var(--motion-medium) var(--ease-premium)",
+              "background var(--motion-medium) var(--ease-premium), opacity var(--motion-medium) var(--ease-premium), transform var(--motion-medium) var(--ease-premium)",
           }}
         />
       ))}

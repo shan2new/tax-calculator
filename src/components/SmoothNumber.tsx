@@ -29,10 +29,13 @@ export function SmoothNumber({
     const prevTarget = targetRef.current;
     targetRef.current = value;
 
-    // On large jumps (tab-switch, initial load) reset velocity so the snap
-    // is immediate rather than counting through a huge range.
+    // On large jumps (tab-switch, initial load) snap position partway
+    // to avoid counting through a huge range. Reset velocity.
     const scale = Math.max(Math.abs(prevTarget), Math.abs(value), 1);
-    if (Math.abs(value - prevTarget) / scale > 0.5) {
+    const jumpRatio = Math.abs(value - prevTarget) / scale;
+    if (jumpRatio > 0.5) {
+      // Snap to 85% of the way — the spring covers the last 15% smoothly
+      posRef.current = prevTarget + (value - prevTarget) * 0.85;
       velRef.current = 0;
     }
 
@@ -46,8 +49,12 @@ export function SmoothNumber({
 
       const diff = targetRef.current - posRef.current;
 
-      // Settle: both position error and velocity must be negligible
-      if (Math.abs(diff) < 0.5 && Math.abs(velRef.current) < 1) {
+      // Relative settlement threshold: scales with value magnitude
+      // Small values (< ₹1000): settle within ₹0.5
+      // Large values (₹50L): settle within ₹50 (invisible at that scale)
+      const threshold = Math.max(0.5, Math.abs(targetRef.current) * 0.000005);
+      const velThreshold = Math.max(1, Math.abs(targetRef.current) * 0.00002);
+      if (Math.abs(diff) < threshold && Math.abs(velRef.current) < velThreshold) {
         posRef.current = targetRef.current;
         velRef.current = 0;
         setDisplay(targetRef.current);
