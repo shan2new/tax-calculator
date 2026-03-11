@@ -1,7 +1,7 @@
 "use client";
 
 import { type CSSProperties } from "react";
-import { BrandMark } from "@/components/BrandMark";
+import { BrandMark } from "@/components/canvas/BrandMark";
 
 interface LegalScreenProps {
   dark: boolean;
@@ -32,7 +32,7 @@ const sections = [
   },
   {
     label: "Privacy",
-    body: "Claros does not collect, store, or transmit any personal or financial data. All calculations happen locally in your browser. No cookies are set. No analytics are collected. No accounts are required. Your financial data never leaves your device.\n\nWhen you use the Share feature, a summary image and URL are generated on your device. The URL contains only the calculation parameters (loan amount, rate, tenure) — no personal identifiers. Sharing is initiated by you and processed through your device's native share sheet.",
+    body: "Claros keeps calculations local to your browser and does not require accounts or server-side storage for your financial inputs. The app currently uses lightweight product analytics to understand reliability and high-level usage patterns, so privacy copy should not imply zero analytics.\n\nWhen you use the Share feature, a summary image and URL are generated on your device. The URL contains only the calculation parameters (loan amount, rate, tenure) — no personal identifiers. Sharing is initiated by you and processed through your device's native share sheet.",
   },
   {
     label: "Disclaimer",

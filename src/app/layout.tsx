@@ -6,7 +6,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Claros — Financial clarity, one decision at a time",
   description:
-    "Loan EMI calculator and Income Tax comparator for India. Intuitive, private, and entirely on-device.",
+    "Loan EMI calculator and Income Tax comparator for India. Intuitive, local-first, and built for financial clarity.",
   keywords:
     "emi calculator, loan calculator, income tax calculator, old vs new regime, home loan, car loan, india",
   authors: [{ name: "shan2new", url: "https://github.com/shan2new" }],

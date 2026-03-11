@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { BrandMark } from "@/components/BrandMark";
-import { MiniRing } from "@/components/MiniRing";
-import { MiniTaxViz } from "@/components/MiniTaxViz";
+import { BrandMark } from "@/components/canvas/BrandMark";
+import { MiniRing } from "@/components/canvas/MiniRing";
+import { MiniTaxViz } from "@/components/canvas/MiniTaxViz";
 import { PressableCard } from "@/components/PressableCard";
 import { Haptic } from "@/hooks/useHaptic";
 import { usePremiumPress } from "@/hooks/usePremiumPress";

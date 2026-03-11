@@ -3,19 +3,16 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRipples } from "@/hooks/useRipples";
 import { Haptic } from "@/hooks/useHaptic";
+import {
+  MOMENTUM_DECAY_PER_FRAME,
+  MOMENTUM_MIN_VELOCITY,
+  SCRUB_INTENT_PX,
+  SCRUB_RELEASE_FLASH_MS,
+  SCRUB_TICK_PULSE_MS,
+  SETTLE_B,
+  SETTLE_K,
+} from "@/lib/constants";
 import { toINRCommas, parseINRInput, humanHint } from "@/lib/format";
-
-const SCRUB_INTENT_PX = 6;
-const MOMENTUM_MIN_VELOCITY = 0.22;
-const MOMENTUM_DECAY_PER_FRAME = 0.88;
-
-// Spring constants for the settle animation (track bar + control display).
-// Slightly overdamped (b > 2√k) so the bar lands with no bounce.
-// Active scrub: tighter spring that tracks finger closely.
-// Release: same spring but velocity is carried over from the drag, giving a
-// natural coast-and-settle feel matching SmoothNumber.
-const SETTLE_K = 210;   // stiffness (units·s⁻²)
-const SETTLE_B = 34;    // damping   (critical ≈ 2√210 ≈ 29.0, b=34 is overdamped)
 
 interface RipplesProps {
   rips: { id: number; x: number; y: number }[];
@@ -243,7 +240,7 @@ export function ScrubValue({
       Haptic.light();
       if (onTick) onTick();
       globalThis.clearTimeout(pulseTimeoutRef.current);
-      pulseTimeoutRef.current = globalThis.setTimeout(() => setDotPulse(false), 180);
+      pulseTimeoutRef.current = globalThis.setTimeout(() => setDotPulse(false), SCRUB_TICK_PULSE_MS);
     }
   }, [value, min, tickStep, scrubbing, onTick]);
 
@@ -375,7 +372,10 @@ export function ScrubValue({
     }
     setReleaseFlash(true);
     globalThis.clearTimeout(releaseTimeoutRef.current);
-    releaseTimeoutRef.current = globalThis.setTimeout(() => setReleaseFlash(false), 220);
+    releaseTimeoutRef.current = globalThis.setTimeout(
+      () => setReleaseFlash(false),
+      SCRUB_RELEASE_FLASH_MS
+    );
     if (
       supportsMomentum &&
       s.target > min &&

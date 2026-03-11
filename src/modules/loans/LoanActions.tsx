@@ -1,0 +1,100 @@
+"use client";
+
+import { ActionButton, PaginationDots } from "@/components/ui";
+import { LOAN_VIEW_COUNT } from "@/lib/constants";
+
+interface LoanActionsProps {
+  comparing: boolean;
+  ringView: number;
+  shareVisible: boolean;
+  onCompareToggle: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onShare: (event: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
+export function LoanActions({
+  comparing,
+  ringView,
+  shareVisible,
+  onCompareToggle,
+  onShare,
+}: Readonly<LoanActionsProps>) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 20,
+        padding: "4px 0 4px",
+      }}
+    >
+      <ActionButton active={comparing} onClick={onCompareToggle}>
+        {comparing ? (
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          >
+            <path d="M18 6L6 18" />
+            <path d="M6 6l12 12" />
+          </svg>
+        ) : (
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          >
+            <path d="M8 3v18" />
+            <path d="M16 3v18" />
+            <path d="M3 9h5" />
+            <path d="M16 15h5" />
+          </svg>
+        )}
+      </ActionButton>
+
+      {!comparing ? <PaginationDots count={LOAN_VIEW_COUNT} activeIndex={ringView} /> : null}
+
+      <ActionButton active={shareVisible} onClick={onShare}>
+        <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          >
+            <path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7" />
+            <polyline points="16 6 12 2 8 6" />
+            <line x1="12" y1="2" x2="12" y2="15" />
+          </svg>
+          {shareVisible ? (
+            <div
+              style={{
+                position: "absolute",
+                bottom: -20,
+                left: "50%",
+                transform: "translateX(-50%)",
+                fontSize: 9,
+                color: "var(--text-muted-mid)",
+                whiteSpace: "nowrap",
+                animation: "hintFade 0.2s ease",
+              }}
+            >
+              Copied
+            </div>
+          ) : null}
+        </div>
+      </ActionButton>
+    </div>
+  );
+}

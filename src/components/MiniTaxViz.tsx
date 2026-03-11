@@ -1,13 +1,13 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { memo, useRef, useEffect } from "react";
 import { THEMES_CANVAS } from "@/lib/theme";
 
 interface MiniTaxVizProps {
   dark: boolean;
 }
 
-export function MiniTaxViz({ dark }: MiniTaxVizProps) {
+export const MiniTaxViz = memo(function MiniTaxViz({ dark }: MiniTaxVizProps) {
   const ref = useRef<HTMLCanvasElement>(null);
   const darkRef = useRef(dark);
   useEffect(() => { darkRef.current = dark; }, [dark]);
@@ -65,4 +65,4 @@ export function MiniTaxViz({ dark }: MiniTaxVizProps) {
   }, []);
 
   return <canvas ref={ref} style={{ display: "block" }} />;
-}
+});

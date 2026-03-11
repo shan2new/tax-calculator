@@ -2,8 +2,9 @@
 
 import { useState, useEffect, type ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import { ThemeProvider, useTheme } from "@/lib/theme-context";
-import { Particles } from "@/components/Particles";
+import { APP_MAX_CONTENT_WIDTH, APP_STORAGE_KEYS } from "@/lib/constants";
+import { ThemeProvider, useTheme } from "@/providers/ThemeProvider";
+import { Particles } from "@/components/canvas/Particles";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { WelcomeOverlay } from "@/screens/Welcome";
 
@@ -15,11 +16,11 @@ function Shell({ children }: Readonly<{ children: ReactNode }>) {
   const [welcomed, setWelcomed] = useState(true);
 
   useEffect(() => {
-    setWelcomed(localStorage.getItem("claros_welcomed") === "1");
+    setWelcomed(localStorage.getItem(APP_STORAGE_KEYS.welcomed) === "1");
   }, []);
 
   const handleAccept = () => {
-    localStorage.setItem("claros_welcomed", "1");
+    localStorage.setItem(APP_STORAGE_KEYS.welcomed, "1");
     setWelcomed(true);
   };
 
@@ -48,7 +49,7 @@ function Shell({ children }: Readonly<{ children: ReactNode }>) {
       <div
         style={{
           width: "100%",
-          maxWidth: 400,
+          maxWidth: APP_MAX_CONTENT_WIDTH,
           padding: "0 24px 48px",
           paddingTop: isHome ? 0 : "max(12px, env(safe-area-inset-top))",
           paddingBottom: "max(48px, env(safe-area-inset-bottom))",
@@ -93,7 +94,7 @@ function Shell({ children }: Readonly<{ children: ReactNode }>) {
   );
 }
 
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <ThemeProvider>
       <Shell>{children}</Shell>

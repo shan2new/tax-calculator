@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Haptic } from "@/hooks/useHaptic";
 import { usePremiumPress } from "@/hooks/usePremiumPress";
+import { WELCOME_DISMISS_DELAY_MS, WELCOME_REVEAL_DELAY_MS } from "@/lib/constants";
 
 interface WelcomeOverlayProps {
   onAccept: () => void;
@@ -13,14 +14,14 @@ export function WelcomeOverlay({ onAccept }: Readonly<WelcomeOverlayProps>) {
   const continuePress = usePremiumPress();
 
   useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 300);
+    const t = setTimeout(() => setVisible(true), WELCOME_REVEAL_DELAY_MS);
     return () => clearTimeout(t);
   }, []);
 
   const handleAccept = () => {
     Haptic.medium();
     setVisible(false);
-    setTimeout(() => onAccept(), 400);
+    setTimeout(() => onAccept(), WELCOME_DISMISS_DELAY_MS);
   };
 
   return (
@@ -84,8 +85,9 @@ export function WelcomeOverlay({ onAccept }: Readonly<WelcomeOverlayProps>) {
             marginBottom: 20,
           }}
         >
-          All calculations run on your device. No data is collected, stored, or shared.
-          Results are indicative and do not constitute financial advice. For users aged 18+.
+          Core calculations run on your device. Claros also uses lightweight analytics for product
+          reliability and usage trends. Results are indicative and do not constitute financial
+          advice. For users aged 18+.
         </div>
 
         <button

@@ -2,7 +2,7 @@
 
 import { NavHeader } from "@/components/NavHeader";
 import { LegalScreen } from "@/screens/Legal";
-import { useTheme } from "@/lib/theme-context";
+import { useTheme } from "@/providers/ThemeProvider";
 
 export default function LegalPage() {
   const { dark } = useTheme();

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { memo, useRef, useEffect } from "react";
 import { THEMES_CANVAS } from "@/lib/theme";
 
 interface RingProps {
@@ -12,7 +12,14 @@ interface RingProps {
   size?: number;
 }
 
-export function Ring({ ir, velocity, tickSignal, dark, pinnedIR, size = 260 }: RingProps) {
+export const Ring = memo(function Ring({
+  ir,
+  velocity,
+  tickSignal,
+  dark,
+  pinnedIR,
+  size = 260,
+}: RingProps) {
   const ref = useRef<HTMLCanvasElement>(null);
   const data = useRef({ ir, vel: 0, tb: 0, pinIR: null as number | null });
   const darkRef = useRef(dark);
@@ -235,4 +242,4 @@ export function Ring({ ir, velocity, tickSignal, dark, pinnedIR, size = 260 }: R
   }, [size]);
 
   return <canvas ref={ref} style={{ display: "block" }} />;
-}
+});

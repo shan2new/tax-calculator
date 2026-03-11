@@ -1,7 +1,7 @@
 "use client";
 
 import { HomeScreen } from "@/screens/Home";
-import { useTheme } from "@/lib/theme-context";
+import { useTheme } from "@/providers/ThemeProvider";
 
 export default function HomePage() {
   const { dark } = useTheme();

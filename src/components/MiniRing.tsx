@@ -1,13 +1,13 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { memo, useRef, useEffect } from "react";
 import { THEMES_CANVAS } from "@/lib/theme";
 
 interface MiniRingProps {
   dark: boolean;
 }
 
-export function MiniRing({ dark }: MiniRingProps) {
+export const MiniRing = memo(function MiniRing({ dark }: MiniRingProps) {
   const ref = useRef<HTMLCanvasElement>(null);
   const darkRef = useRef(dark);
   useEffect(() => { darkRef.current = dark; }, [dark]);
@@ -81,4 +81,4 @@ export function MiniRing({ dark }: MiniRingProps) {
   }, []);
 
   return <canvas ref={ref} style={{ display: "block" }} />;
-}
+});
