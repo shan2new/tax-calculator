@@ -1,0 +1,39 @@
+# Claros
+
+> Claros is a free, privacy-first financial calculator for India. It runs entirely on-device with zero data sent to servers. It covers EMI/loan calculations and old-vs-new income tax regime comparison for FY 2025-26.
+
+Claros helps Indian salaried individuals and borrowers make better financial decisions. All computations happen client-side in the browser — no sign-up, no ads, no tracking beyond basic anonymized analytics.
+
+Key capabilities:
+- EMI calculator for home loans, car loans, personal loans, and education loans
+- Year-by-year amortization schedule showing when principal overtakes interest
+- Income tax comparison between old and new regime for FY 2025-26 (AY 2026-27)
+- Monthly take-home pay calculation with effective tax rate
+- Supports Indian currency shortcuts (50L, 1.5Cr) for quick input
+- Works offline as a progressive web app
+
+Tax data: Updated for FY 2025-26 budget with new regime slabs (0–4L nil, 4–8L 5%, 8–12L 10%, 12–16L 15%, 16–20L 20%, 20–24L 25%, above 24L 30%). Section 87A rebate makes income up to 12L tax-free under new regime. Standard deduction: 75K (new) / 50K (old).
+
+Typical loan rates in India (2025-26): Home loans 8.25–9.5%, car loans 8.5–12%, personal loans 10.5–18%, education loans 8–12%.
+
+## Tools
+
+- [EMI Calculator](https://getclaros.in/loans): Calculate monthly EMI for home, car, personal, and education loans. See total interest, amortization schedule, and interest-to-principal crossover point.
+- [Income Tax Calculator](https://getclaros.in/tax): Compare old vs new income tax regime for FY 2025-26. See monthly take-home, effective tax rate, and which regime saves more.
+
+## Popular Calculations
+
+- [Tax on 10 LPA salary](https://getclaros.in/tax/fy-2025-26/10-lpa): Zero tax under new regime due to Section 87A rebate
+- [Tax on 12 LPA salary](https://getclaros.in/tax/fy-2025-26/12-lpa): Zero tax under new regime (rebate limit)
+- [Tax on 15 LPA salary](https://getclaros.in/tax/fy-2025-26/15-lpa): ~97.5K tax under new regime
+- [Tax on 20 LPA salary](https://getclaros.in/tax/fy-2025-26/20-lpa): New regime typically saves more
+- [Tax on 25 LPA salary](https://getclaros.in/tax/fy-2025-26/25-lpa): Old regime may save more with high deductions
+- [Tax on 50 LPA salary](https://getclaros.in/tax/fy-2025-26/50-lpa): Regime choice depends heavily on deductions
+- [50L Home Loan EMI at 8.5%](https://getclaros.in/loans/home-loan/50-lakh/8.5-percent/20-years): ~43.4K/month for 20 years
+- [1Cr Home Loan EMI at 8.5%](https://getclaros.in/loans/home-loan/1-crore/8.5-percent/20-years): ~86.8K/month for 20 years
+- [10L Car Loan EMI at 9%](https://getclaros.in/loans/car-loan/10-lakh/9-percent/5-years): ~20.8K/month for 5 years
+- [5L Personal Loan EMI at 12%](https://getclaros.in/loans/personal-loan/5-lakh/12-percent/3-years): ~16.6K/month for 3 years
+
+## Optional
+
+- [About & Legal](https://getclaros.in/legal): Disclaimer, privacy policy, and terms
