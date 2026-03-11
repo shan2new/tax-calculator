@@ -17,14 +17,26 @@ import { LoanTypeTabs } from "@/modules/loans/LoanTypeTabs";
 import { AmortizationChart } from "@/modules/loans/AmortizationChart";
 import type { LoanDelta, PinnedLoanSnapshot } from "@/modules/loans/types";
 
-export function LoanModule() {
+interface LoanModuleProps {
+  initialType?: number;
+  initialAmount?: number;
+  initialRate?: number;
+  initialTenure?: number;
+}
+
+export function LoanModule({
+  initialType = 0,
+  initialAmount,
+  initialRate,
+  initialTenure,
+}: LoanModuleProps = {}) {
   const { dark } = useTheme();
-  const [activeTypeIndex, setActiveTypeIndex] = useState(0);
+  const [activeTypeIndex, setActiveTypeIndex] = useState(initialType);
   const loanType = LOAN_TYPES[activeTypeIndex];
 
-  const [amount, setAmount] = useState(loanType.amt);
-  const [rate, setRate] = useState(loanType.rate);
-  const [tenure, setTenure] = useState(loanType.yr);
+  const [amount, setAmount] = useState(initialAmount ?? loanType.amt);
+  const [rate, setRate] = useState(initialRate ?? loanType.rate);
+  const [tenure, setTenure] = useState(initialTenure ?? loanType.yr);
   const [velocity, setVelocity] = useState(0);
   const [tickSignal, setTickSignal] = useState(0);
   const [comparing, setComparing] = useState(false);

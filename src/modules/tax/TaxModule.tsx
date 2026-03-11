@@ -15,9 +15,14 @@ import { TaxControls } from "@/modules/tax/TaxControls";
 import { TaxDisclaimer } from "@/modules/tax/TaxDisclaimer";
 import { TaxHero } from "@/modules/tax/TaxHero";
 
-export function TaxModule() {
-  const [income, setIncome] = useState(1500000);
-  const [deductions, setDeductions] = useState(200000);
+interface TaxModuleProps {
+  initialIncome?: number;
+  initialDeductions?: number;
+}
+
+export function TaxModule({ initialIncome = 1500000, initialDeductions = 200000 }: TaxModuleProps = {}) {
+  const [income, setIncome] = useState(initialIncome);
+  const [deductions, setDeductions] = useState(initialDeductions);
   const [velocity, setVelocity] = useState(0);
   const [tickPulse, setTickPulse] = useState(false);
   const [verdictPulse, setVerdictPulse] = useState(false);

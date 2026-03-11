@@ -1,18 +1,23 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import { AppShell } from "@/components/AppShell";
+import { JsonLd } from "@/components/seo/JsonLd";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Claros — Financial clarity, one decision at a time",
+  title: "Claros — Free EMI Calculator & Income Tax Comparator for India",
   description:
-    "Loan EMI calculator and Income Tax comparator for India. Intuitive, local-first, and built for financial clarity.",
+    "Calculate loan EMI for home, car, personal & education loans. Compare old vs new income tax regime for FY 2025-26. Fast, private, entirely on-device.",
   keywords:
-    "emi calculator, loan calculator, income tax calculator, old vs new regime, home loan, car loan, india",
-  authors: [{ name: "shan2new", url: "https://github.com/shan2new" }],
-  creator: "shan2new",
+    "emi calculator, loan calculator, income tax calculator, old vs new regime, home loan emi, car loan emi, tax calculator india, FY 2025-26",
+  authors: [{ name: "Shantanu Sinha", url: "https://github.com/shan2new" }],
+  creator: "Shantanu Sinha",
   robots: "index, follow",
-  metadataBase: new URL("https://claros.app"),
+  metadataBase: new URL("https://getclaros.in"),
+  alternates: {
+    canonical: "https://getclaros.in/",
+    languages: { "en-IN": "https://getclaros.in/" },
+  },
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
@@ -23,9 +28,10 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    url: "https://claros.app",
-    title: "Claros — Financial clarity, one decision at a time",
-    description: "Loan EMI calculator and Income Tax comparator for India.",
+    url: "https://getclaros.in",
+    title: "Claros — Free EMI Calculator & Income Tax Comparator for India",
+    description:
+      "Calculate loan EMI for home, car, personal & education loans. Compare old vs new income tax regime for FY 2025-26. Fast, private, entirely on-device.",
     siteName: "Claros",
     locale: "en_IN",
   },
@@ -46,6 +52,39 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+const webAppSchema = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "Claros",
+    url: "https://getclaros.in",
+    applicationCategory: "FinanceApplication",
+    operatingSystem: "Web",
+    description:
+      "Free EMI calculator and income tax comparator for India. Compare old vs new tax regime, calculate loan EMI with amortization schedule.",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
+    creator: { "@type": "Person", name: "Shantanu Sinha", url: "https://github.com/shan2new" },
+    featureList: [
+      "Loan EMI calculation with amortization schedule",
+      "Old vs New income tax regime comparison",
+      "Support for Home, Car, Personal, Education loans",
+      "FY 2025-26 tax slabs",
+      "Entirely on-device computation — no data sent to servers",
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Claros",
+    url: "https://getclaros.in",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://getclaros.in/loans?q={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  },
+];
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -54,6 +93,7 @@ export default function RootLayout({
   return (
     <html lang="en-IN">
       <body>
+        <JsonLd data={webAppSchema} />
         <AppShell>{children}</AppShell>
         <Analytics />
       </body>

@@ -61,7 +61,7 @@ export function HomeScreen({ dark }: Readonly<HomeScreenProps>) {
         >
           {greeting}
         </div>
-        <div
+        <h1
           style={{
             fontSize: 32,
             fontWeight: 200,
@@ -69,21 +69,23 @@ export function HomeScreen({ dark }: Readonly<HomeScreenProps>) {
             letterSpacing: "-0.04em",
             fontFamily: "var(--font)",
             lineHeight: 1,
+            margin: 0,
           }}
         >
           Claros
-        </div>
-        <div
+        </h1>
+        <p
           style={{
             fontSize: 13,
             color: "var(--text-muted-faint)",
             marginTop: 8,
+            marginBottom: 0,
             letterSpacing: "0.02em",
             fontWeight: 300,
           }}
         >
           Financial clarity, one decision at a time.
-        </div>
+        </p>
       </div>
 
       {/* Module cards */}
@@ -121,27 +123,29 @@ export function HomeScreen({ dark }: Readonly<HomeScreenProps>) {
                     transition: "transform var(--motion-medium) var(--ease-premium)",
                   }}
                 >
-                  <div
+                  <h2
                     style={{
                       fontSize: 18,
                       fontWeight: 300,
                       color: "var(--text-primary)",
                       letterSpacing: "-0.01em",
                       marginBottom: 5,
+                      marginTop: 0,
                     }}
                   >
                     {m.title}
-                  </div>
-                  <div
+                  </h2>
+                  <p
                     style={{
                       fontSize: 12,
                       color: "var(--text-muted)",
                       letterSpacing: "0.01em",
                       lineHeight: 1.4,
+                      margin: 0,
                     }}
                   >
                     {m.desc}
-                  </div>
+                  </p>
                 </div>
                 <svg
                   width="16"

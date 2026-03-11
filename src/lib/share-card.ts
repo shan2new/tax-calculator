@@ -14,7 +14,7 @@ interface LoanShareCardParams {
 }
 
 export function buildLoanShareUrl(amount: number, rate: number, tenure: number) {
-  return `https://claros.app/loan?a=${amount}&r=${rate}&t=${tenure}`;
+  return `https://getclaros.in/loans?a=${amount}&r=${rate}&t=${tenure}`;
 }
 
 export function buildLoanShareCardBlob({
@@ -142,7 +142,7 @@ export function buildLoanShareCardBlob({
     ctx.fillText("C L A R O S", width / 2, height - 50);
     ctx.font = "300 10px -apple-system, system-ui, sans-serif";
     ctx.fillStyle = dark ? "rgba(255,255,255,0.18)" : "rgba(42,37,32,0.18)";
-    ctx.fillText("claros.app", width / 2, height - 32);
+    ctx.fillText("getclaros.in", width / 2, height - 32);
 
     canvas.toBlob((blob) => resolve(blob), "image/png");
   });

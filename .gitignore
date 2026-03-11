@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# next-sitemap (generated at build)
+/public/sitemap*.xml
+
 # production
 /build
 
