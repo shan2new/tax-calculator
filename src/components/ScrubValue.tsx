@@ -671,7 +671,6 @@ export function ScrubValue({
         WebkitUserSelect: "none",
         touchAction: "pan-y",
         position: "relative",
-        overflow: "hidden",
         minHeight: 44,
       }}
     >
@@ -683,9 +682,10 @@ export function ScrubValue({
           justifyContent: "space-between",
           position: "relative",
           zIndex: 1,
+          overflow: "visible",
         }}
       >
-        <div style={{ flexShrink: 0, marginRight: 12 }}>
+        <div style={{ flexShrink: 1, minWidth: 0, marginRight: 12 }}>
           <span
             style={{
               fontSize: 12,
@@ -721,6 +721,7 @@ export function ScrubValue({
             alignItems: "flex-end",
             justifyContent: "center",
             minWidth: isAmount ? 180 : 120,
+            flexShrink: 0,
             minHeight: isAmount ? 40 : 32,
           }}
         >
