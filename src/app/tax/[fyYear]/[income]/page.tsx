@@ -135,39 +135,6 @@ export default async function TaxDetailPage({ params }: { params: Promise<PagePa
           : `${betterRegime === "new" ? "New" : "Old"} regime saves more · ${fy}`}
       />
 
-      <div style={{
-        padding: "0 24px 24px",
-        opacity: 0,
-        animation: "navIn 0.65s cubic-bezier(0.16,1,0.3,1) 120ms both",
-      }}>
-
-        <TaxInsights
-          income={income}
-          totalNew={totalNew}
-          totalOld={totalOld}
-          takeHome={takeHome}
-          effectiveRate={effectiveRate}
-          savings={savings}
-          betterRegime={betterRegime}
-          deductions={DEFAULT_DEDUCTIONS}
-        />
-      </div>
-
-      <p
-        style={{
-          fontSize: 11,
-          color: "var(--text-muted-faint)",
-          letterSpacing: "0.06em",
-          textTransform: "uppercase",
-          margin: "0 0 8px",
-          padding: "0 24px",
-          opacity: 0,
-          animation: "navIn 0.5s cubic-bezier(0.16,1,0.3,1) 260ms both",
-        }}
-      >
-        Adjust &amp; Recalculate
-      </p>
-
       <TaxModule initialIncome={income} initialDeductions={DEFAULT_DEDUCTIONS} />
 
       {/* Tool Terminus */}
@@ -198,6 +165,19 @@ export default async function TaxDetailPage({ params }: { params: Promise<PagePa
         opacity: 0,
         animation: "navIn 0.5s cubic-bezier(0.16,1,0.3,1) 680ms both",
       }}>
+        <div style={{ marginBottom: 24 }}>
+          <TaxInsights
+            income={income}
+            totalNew={totalNew}
+            totalOld={totalOld}
+            takeHome={takeHome}
+            effectiveRate={effectiveRate}
+            savings={savings}
+            betterRegime={betterRegime}
+            deductions={DEFAULT_DEDUCTIONS}
+          />
+        </div>
+
         <TaxSlabTable defaultOpen />
         <TaxContent />
         <TaxFAQ />

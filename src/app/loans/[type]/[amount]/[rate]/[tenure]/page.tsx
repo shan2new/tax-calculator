@@ -151,40 +151,6 @@ export default async function LoanDetailPage({ params }: { params: Promise<PageP
         subtitle={`${emiStr}/mo · ${rate}% · ${tenure} yrs`}
       />
 
-      <div style={{
-        padding: "0 24px 24px",
-        opacity: 0,
-        animation: "navIn 0.65s cubic-bezier(0.16,1,0.3,1) 120ms both",
-      }}>
-
-        <LoanInsights
-          amount={amount}
-          rate={rate}
-          tenure={tenure}
-          emi={emi}
-          total={total}
-          interest={interest}
-          years={years}
-          crossoverIndex={crossoverIndex}
-          loanLabel={config.label}
-        />
-      </div>
-
-      <p
-        style={{
-          fontSize: 11,
-          color: "var(--text-muted-faint)",
-          letterSpacing: "0.06em",
-          textTransform: "uppercase",
-          margin: "0 0 8px",
-          padding: "0 24px",
-          opacity: 0,
-          animation: "navIn 0.5s cubic-bezier(0.16,1,0.3,1) 260ms both",
-        }}
-      >
-        Adjust &amp; Recalculate
-      </p>
-
       <LoanModule
         initialType={config.typeIndex}
         initialAmount={amount}
@@ -220,6 +186,20 @@ export default async function LoanDetailPage({ params }: { params: Promise<PageP
         opacity: 0,
         animation: "navIn 0.5s cubic-bezier(0.16,1,0.3,1) 680ms both",
       }}>
+        <div style={{ marginBottom: 24 }}>
+          <LoanInsights
+            amount={amount}
+            rate={rate}
+            tenure={tenure}
+            emi={emi}
+            total={total}
+            interest={interest}
+            years={years}
+            crossoverIndex={crossoverIndex}
+            loanLabel={config.label}
+          />
+        </div>
+
         <details
           open
           style={{ marginTop: 24 }}
