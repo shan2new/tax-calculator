@@ -18,9 +18,9 @@ export const SHARE_TOAST_MS = 2000;
 
 export const SCRUB_INTENT_PX = 6;
 export const MOMENTUM_MIN_VELOCITY = 0.22;
-export const MOMENTUM_DECAY_BASE = 0.91;      // gentler initial decay (was 0.88)
-export const MOMENTUM_DECAY_FAST = 0.84;       // tighter at high velocity
-export const MOMENTUM_VEL_KNEE = 0.6;          // px/ms threshold for decay blend
+export const MOMENTUM_DECAY_BASE = 0.91; // gentler initial decay (was 0.88)
+export const MOMENTUM_DECAY_FAST = 0.84; // tighter at high velocity
+export const MOMENTUM_VEL_KNEE = 0.6; // px/ms threshold for decay blend
 export const SETTLE_K = 210;
 export const SETTLE_B = 34;
 
@@ -47,6 +47,6 @@ export const TAX_CONTROL_CONFIG = {
   deductions: {
     step: 10000,
     sensitivity: 1,
-    tickStep: 50000,
+    tickStep: 100000,
   },
 } as const;

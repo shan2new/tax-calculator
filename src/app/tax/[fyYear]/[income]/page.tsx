@@ -9,7 +9,12 @@ import { RelatedTaxLinks } from "@/components/seo/RelatedTaxLinks";
 import { TaxContent } from "@/components/seo/TaxContent";
 import { SEOFooter } from "@/components/seo/SEOFooter";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { TAX_INCOMES, parseIncomeSlug, formatIncomeForTitle, formatFyYear } from "@/lib/seo-utils";
+import {
+  TAX_INCOMES,
+  parseIncomeSlug,
+  formatIncomeForTitle,
+  formatFyYear,
+} from "@/lib/seo-utils";
 import { calcTaxNew, calcTaxOld } from "@/lib/calc";
 
 export const dynamicParams = true;
@@ -24,7 +29,11 @@ export async function generateStaticParams(): Promise<PageParams[]> {
   return TAX_INCOMES.map((income) => ({ fyYear: "fy-2025-26", income }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<PageParams> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<PageParams>;
+}): Promise<Metadata> {
   const p = await params;
   const income = parseIncomeSlug(p.income);
   const fy = formatFyYear(p.fyYear);
@@ -38,7 +47,8 @@ export async function generateMetadata({ params }: { params: Promise<PageParams>
   const bestTax = Math.min(totalNew, totalOld);
   const takeHome = Math.round((income - bestTax) / 12);
   const savings = totalOld - totalNew;
-  const betterRegime = savings > 0 ? "new regime" : savings < 0 ? "old regime" : "both regimes";
+  const betterRegime =
+    savings > 0 ? "new regime" : savings < 0 ? "old regime" : "both regimes";
   const absSavings = Math.abs(savings);
   const incomeLabel = formatIncomeForTitle(p.income);
   const takeHomeStr = `₹${takeHome.toLocaleString("en-IN")}`;
@@ -87,7 +97,11 @@ const pillStyle: React.CSSProperties = {
   fontWeight: 300,
 };
 
-export default async function TaxDetailPage({ params }: { params: Promise<PageParams> }) {
+export default async function TaxDetailPage({
+  params,
+}: {
+  params: Promise<PageParams>;
+}) {
   const p = await params;
   const income = parseIncomeSlug(p.income);
   const fy = formatFyYear(p.fyYear);
@@ -111,7 +125,8 @@ export default async function TaxDetailPage({ params }: { params: Promise<PagePa
   const bestTax = Math.min(totalNew, totalOld);
   const takeHome = Math.round((income - bestTax) / 12);
   const effectiveRate = income > 0 ? (bestTax / income) * 100 : 0;
-  const betterRegime: "new" | "old" | "same" = savings > 0 ? "new" : savings < 0 ? "old" : "same";
+  const betterRegime: "new" | "old" | "same" =
+    savings > 0 ? "new" : savings < 0 ? "old" : "same";
   const incomeLabel = formatIncomeForTitle(p.income);
   const canonical = `https://getclaros.in/tax/${p.fyYear}/${p.income}`;
 
@@ -119,9 +134,23 @@ export default async function TaxDetailPage({ params }: { params: Promise<PagePa
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://getclaros.in" },
-      { "@type": "ListItem", position: 2, name: "Income Tax Calculator", item: "https://getclaros.in/tax" },
-      { "@type": "ListItem", position: 3, name: `Tax on ${incomeLabel} — ${fy}` },
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://getclaros.in",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Income Tax Calculator",
+        item: "https://getclaros.in/tax",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: `Tax on ${incomeLabel} — ${fy}`,
+      },
     ],
   };
 
@@ -130,15 +159,27 @@ export default async function TaxDetailPage({ params }: { params: Promise<PagePa
       <JsonLd data={breadcrumb} />
       <NavHeader
         title={`Income Tax on ${incomeLabel} Salary`}
-        subtitle={betterRegime === "same"
-          ? `Both regimes equal · ${fy}`
-          : `${betterRegime === "new" ? "New" : "Old"} regime saves more · ${fy}`}
+        subtitle={
+          betterRegime === "same"
+            ? `Both regimes equal · ${fy}`
+            : `${betterRegime === "new" ? "New" : "Old"} regime saves more · ${fy}`
+        }
       />
 
-      <TaxModule initialIncome={income} initialDeductions={DEFAULT_DEDUCTIONS} />
+      <TaxModule
+        initialIncome={income}
+        initialDeductions={DEFAULT_DEDUCTIONS}
+        fromUrl
+      />
 
       {/* Tool Terminus */}
-      <div style={{ padding: "0 24px", opacity: 0, animation: "navIn 0.5s cubic-bezier(0.16,1,0.3,1) 560ms both" }}>
+      <div
+        style={{
+          padding: "0 24px",
+          opacity: 0,
+          animation: "navIn 0.5s cubic-bezier(0.16,1,0.3,1) 560ms both",
+        }}
+      >
         <p
           style={{
             fontSize: 11,
@@ -147,24 +188,37 @@ export default async function TaxDetailPage({ params }: { params: Promise<PagePa
             margin: "16px 0 0",
           }}
         >
-          Calculations are indicative for FY 2025-26. Excludes surcharge above ₹50L, special incomes, and state levies. Not tax advice.
+          Calculations are indicative for FY 2025-26. Excludes surcharge above
+          ₹50L, special incomes, and state levies. Not tax advice.
         </p>
-        <hr style={{ border: "none", borderTop: "1px solid var(--border, rgba(255,255,255,0.08))", margin: "20px 0 16px" }} />
+        <hr
+          style={{
+            border: "none",
+            borderTop: "1px solid var(--border, rgba(255,255,255,0.08))",
+            margin: "20px 0 16px",
+          }}
+        />
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          <Link href="/tax" style={pillStyle}>Try a different salary</Link>
-          <Link href="/loans" style={pillStyle}>EMI Calculator</Link>
+          <Link href="/tax" style={pillStyle}>
+            Try a different salary
+          </Link>
+          <Link href="/loans" style={pillStyle}>
+            EMI Calculator
+          </Link>
         </div>
       </div>
 
       {/* SEO Content Zone */}
-      <div style={{
-        padding: "0 24px 40px",
-        fontSize: "0.9em",
-        color: "var(--text-muted)",
-        marginTop: 48,
-        opacity: 0,
-        animation: "navIn 0.5s cubic-bezier(0.16,1,0.3,1) 680ms both",
-      }}>
+      <div
+        style={{
+          padding: "0 24px 40px",
+          fontSize: "0.9em",
+          color: "var(--text-muted)",
+          marginTop: 48,
+          opacity: 0,
+          animation: "navIn 0.5s cubic-bezier(0.16,1,0.3,1) 680ms both",
+        }}
+      >
         <div style={{ marginBottom: 24 }}>
           <TaxInsights
             income={income}

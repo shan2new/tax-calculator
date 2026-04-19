@@ -22,7 +22,14 @@ interface RipplesProps {
 
 function Ripples({ rips }: Readonly<RipplesProps>) {
   return (
-    <div style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden" }}>
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        pointerEvents: "none",
+        overflow: "hidden",
+      }}
+    >
       {rips.map((r) => (
         <div
           key={r.id}
@@ -33,7 +40,8 @@ function Ripples({ rips }: Readonly<RipplesProps>) {
             width: 0,
             height: 0,
             borderRadius: "50%",
-            background: "radial-gradient(circle, var(--ripple) 0%, transparent 70%)",
+            background:
+              "radial-gradient(circle, var(--ripple) 0%, transparent 70%)",
             animation: "rip 0.7s cubic-bezier(0.16,1,0.3,1) forwards",
             transform: "translate(-50%,-50%)",
           }}
@@ -58,6 +66,8 @@ interface ScrubValueProps {
   isAmount?: boolean;
   tickStep?: number;
   onTick?: () => void;
+  prominent?: boolean;
+  sublabel?: string;
 }
 
 export function ScrubValue({
@@ -75,6 +85,8 @@ export function ScrubValue({
   isAmount,
   tickStep,
   onTick,
+  prominent = false,
+  sublabel,
 }: Readonly<ScrubValueProps>) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
@@ -103,23 +115,32 @@ export function ScrubValue({
     moved: false,
     lx: 0,
     lt: 0,
-    vel: 0,         // scrub gesture velocity  (px / ms)
-    displayVel: 0,  // settle spring velocity  (value units / s)
+    vel: 0, // scrub gesture velocity  (px / ms)
+    displayVel: 0, // settle spring velocity  (value units / s)
   });
   const momentumRef = useRef<number>(0);
   const settleRef = useRef<number>(0);
-  const pulseTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const releaseTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const boundaryTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const pulseTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+  const releaseTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+  const boundaryTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
   const lastBoundaryRef = useRef<"min" | "max" | null>(null);
   const cRef = useRef<HTMLDivElement>(null);
   const { rips, add } = useRipples();
   const prevBucket = useRef(Math.floor((value - min) / (tickStep || 1)));
 
-  const clampRaw = useCallback((v: number) => Math.min(max, Math.max(min, v)), [min, max]);
+  const clampRaw = useCallback(
+    (v: number) => Math.min(max, Math.max(min, v)),
+    [min, max],
+  );
   const clamp = useCallback(
     (v: number) => Math.min(max, Math.max(min, Math.round(v / step) * step)),
-    [min, max, step]
+    [min, max, step],
   );
   const range = max - min || 1;
   const supportsMomentum = range / step >= 40;
@@ -128,7 +149,8 @@ export function ScrubValue({
 
   const parsedDraft = isAmount ? parseINRInput(draft) : Number.NaN;
   const hint = (() => {
-    if (!editing || !isAmount || Number.isNaN(parsedDraft) || parsedDraft <= 0) return "";
+    if (!editing || !isAmount || Number.isNaN(parsedDraft) || parsedDraft <= 0)
+      return "";
     // Show complementary format: shorthand input → expanded, raw digits → compact
     if (/\d\s*(?:cr|l)\s*$/i.test(draft)) return fINR(parsedDraft);
     return humanHint(parsedDraft);
@@ -137,7 +159,8 @@ export function ScrubValue({
   const getEdgeResistance = useCallback(
     (currentValue: number, direction: number) => {
       if (direction === 0) return 1;
-      const distanceToEdge = direction > 0 ? max - currentValue : currentValue - min;
+      const distanceToEdge =
+        direction > 0 ? max - currentValue : currentValue - min;
       const band = Math.max(range * 0.16, step * 8);
       if (distanceToEdge <= 0) return 0.12;
       if (distanceToEdge >= band) return 1;
@@ -146,7 +169,7 @@ export function ScrubValue({
       const eased = t * t * (3 - 2 * t); // smoothstep
       return 0.12 + eased * 0.88;
     },
-    [max, min, range, step]
+    [max, min, range, step],
   );
 
   const getStepTravelPx = useCallback(() => {
@@ -171,18 +194,25 @@ export function ScrubValue({
       const eased = Math.pow(travel, 1.35);
       return 1 + eased * (isAmount ? 4.5 : 2.5);
     },
-    [isAmount]
+    [isAmount],
   );
 
   const projectDelta = useCallback(
-    (deltaPx: number, totalDx: number, currentValue: number, useBoost = true) => {
+    (
+      deltaPx: number,
+      totalDx: number,
+      currentValue: number,
+      useBoost = true,
+    ) => {
       if (deltaPx === 0) return 0;
       const direction = Math.sign(deltaPx);
       const resistance = getEdgeResistance(currentValue, direction);
       const boost = useBoost ? getTravelBoost(totalDx) : 1;
-      return (deltaPx / getStepTravelPx()) * step * sensitivity * resistance * boost;
+      return (
+        (deltaPx / getStepTravelPx()) * step * sensitivity * resistance * boost
+      );
     },
-    [getEdgeResistance, getStepTravelPx, getTravelBoost, sensitivity, step]
+    [getEdgeResistance, getStepTravelPx, getTravelBoost, sensitivity, step],
   );
 
   const commitValue = useCallback(
@@ -193,20 +223,20 @@ export function ScrubValue({
         onChange(snapped);
       }
     },
-    [clamp, onChange]
+    [clamp, onChange],
   );
 
-  const fireBoundaryHit = useCallback(
-    (edge: "min" | "max") => {
-      if (lastBoundaryRef.current === edge) return; // don't re-fire same edge
-      lastBoundaryRef.current = edge;
-      Haptic.medium();
-      setBoundaryHit(edge);
-      globalThis.clearTimeout(boundaryTimeoutRef.current);
-      boundaryTimeoutRef.current = globalThis.setTimeout(() => setBoundaryHit(null), 280);
-    },
-    []
-  );
+  const fireBoundaryHit = useCallback((edge: "min" | "max") => {
+    if (lastBoundaryRef.current === edge) return; // don't re-fire same edge
+    lastBoundaryRef.current = edge;
+    Haptic.medium();
+    setBoundaryHit(edge);
+    globalThis.clearTimeout(boundaryTimeoutRef.current);
+    boundaryTimeoutRef.current = globalThis.setTimeout(
+      () => setBoundaryHit(null),
+      280,
+    );
+  }, []);
 
   const clearBoundaryTracking = useCallback(() => {
     lastBoundaryRef.current = null;
@@ -218,7 +248,7 @@ export function ScrubValue({
       scrubR.current.animated = bounded;
       setDisplayValue(bounded);
     },
-    [clampRaw]
+    [clampRaw],
   );
 
   const stopSettling = useCallback(() => {
@@ -239,7 +269,10 @@ export function ScrubValue({
       const diff = s.target - s.animated;
 
       // Settle when both position error and velocity are negligible
-      if (Math.abs(diff) < step * 0.12 && Math.abs(s.displayVel) < step * 0.25) {
+      if (
+        Math.abs(diff) < step * 0.12 &&
+        Math.abs(s.displayVel) < step * 0.25
+      ) {
         applyAnimatedValue(s.target);
         commitValue(s.target);
         s.displayVel = 0;
@@ -269,7 +302,10 @@ export function ScrubValue({
       Haptic.light();
       if (onTick) onTick();
       globalThis.clearTimeout(pulseTimeoutRef.current);
-      pulseTimeoutRef.current = globalThis.setTimeout(() => setDotPulse(false), SCRUB_TICK_PULSE_MS);
+      pulseTimeoutRef.current = globalThis.setTimeout(
+        () => setDotPulse(false),
+        SCRUB_TICK_PULSE_MS,
+      );
     }
   }, [value, min, tickStep, scrubbing, onTick]);
 
@@ -353,7 +389,8 @@ export function ScrubValue({
         // This creates a natural deceleration curve like a ball on grass
         const absV = Math.abs(v);
         const blend = Math.min(absV / MOMENTUM_VEL_KNEE, 1);
-        const decayRate = MOMENTUM_DECAY_BASE * (1 - blend) + MOMENTUM_DECAY_FAST * blend;
+        const decayRate =
+          MOMENTUM_DECAY_BASE * (1 - blend) + MOMENTUM_DECAY_FAST * blend;
         const decay = Math.pow(decayRate, dt / 16.6667);
         v *= decay;
         if (Math.abs(v) < 0.01) {
@@ -363,7 +400,12 @@ export function ScrubValue({
         }
 
         const deltaPx = v * dt;
-        const deltaVal = projectDelta(deltaPx, deltaPx, scrubR.current.target, false);
+        const deltaVal = projectDelta(
+          deltaPx,
+          deltaPx,
+          scrubR.current.target,
+          false,
+        );
         const unclamped = scrubR.current.target + deltaVal;
         scrubR.current.target = clampRaw(unclamped);
 
@@ -379,7 +421,15 @@ export function ScrubValue({
       };
       momentumRef.current = requestAnimationFrame(coast);
     },
-    [clampRaw, commitValue, fireBoundaryHit, min, max, projectDelta, startSettling]
+    [
+      clampRaw,
+      commitValue,
+      fireBoundaryHit,
+      min,
+      max,
+      projectDelta,
+      startSettling,
+    ],
   );
 
   const onDown = (e: React.PointerEvent) => {
@@ -413,7 +463,11 @@ export function ScrubValue({
 
     const totalDx = e.clientX - s.sx;
     const totalDy = e.clientY - s.sy;
-    if (!s.moved && Math.abs(totalDx) < SCRUB_INTENT_PX && Math.abs(totalDy) < SCRUB_INTENT_PX) {
+    if (
+      !s.moved &&
+      Math.abs(totalDx) < SCRUB_INTENT_PX &&
+      Math.abs(totalDy) < SCRUB_INTENT_PX
+    ) {
       return;
     }
     if (!s.moved) {
@@ -470,7 +524,7 @@ export function ScrubValue({
     globalThis.clearTimeout(releaseTimeoutRef.current);
     releaseTimeoutRef.current = globalThis.setTimeout(
       () => setReleaseFlash(false),
-      SCRUB_RELEASE_FLASH_MS
+      SCRUB_RELEASE_FLASH_MS,
     );
     if (
       supportsMomentum &&
@@ -515,7 +569,7 @@ export function ScrubValue({
       globalThis.clearTimeout(shakeTimeoutRef.current);
       globalThis.clearTimeout(boundaryTimeoutRef.current);
     },
-    [stopSettling]
+    [stopSettling],
   );
 
   const commit = (fromBlur = false) => {
@@ -528,7 +582,10 @@ export function ScrubValue({
 
     let p: number;
     if (isAmount) p = parseINRInput(trimmed);
-    else p = parseInput ? parseInput(trimmed) : Number.parseFloat(trimmed.replaceAll(",", ""));
+    else
+      p = parseInput
+        ? parseInput(trimmed)
+        : Number.parseFloat(trimmed.replaceAll(",", ""));
 
     if (!Number.isNaN(p) && Number.isFinite(p)) {
       // Clamp to valid range (don't reject out-of-range, just snap)
@@ -551,7 +608,10 @@ export function ScrubValue({
       requestAnimationFrame(() => {
         setShakeError(true);
         Haptic.light();
-        shakeTimeoutRef.current = window.setTimeout(() => setShakeError(false), 400);
+        shakeTimeoutRef.current = window.setTimeout(
+          () => setShakeError(false),
+          400,
+        );
       });
     }
   };
@@ -564,7 +624,10 @@ export function ScrubValue({
         Haptic.medium();
         setBoundaryHit(direction > 0 ? "max" : "min");
         globalThis.clearTimeout(boundaryTimeoutRef.current);
-        boundaryTimeoutRef.current = globalThis.setTimeout(() => setBoundaryHit(null), 280);
+        boundaryTimeoutRef.current = globalThis.setTimeout(
+          () => setBoundaryHit(null),
+          280,
+        );
         return;
       }
       Haptic.light();
@@ -577,7 +640,7 @@ export function ScrubValue({
       stopSettling();
       onChange(next);
     },
-    [clamp, onChange, step, stopSettling, value]
+    [clamp, onChange, step, stopSettling, value],
   );
 
   let labelColor = "var(--text-muted)";
@@ -611,12 +674,14 @@ export function ScrubValue({
   let cursor = "grab";
   if (editing) cursor = "text";
   else if (scrubbing) cursor = "grabbing";
-  const valueText = scrubbing && scrubFormat ? scrubFormat(visibleValue) : format(visibleValue);
+  const valueText =
+    scrubbing && scrubFormat ? scrubFormat(visibleValue) : format(visibleValue);
 
   const openEditor = useCallback(() => {
     let initial: string;
     if (isAmount) initial = toINRCommas(String(Math.round(value)));
-    else if (typeof value === "number" && value % 1 !== 0) initial = value.toFixed(1);
+    else if (typeof value === "number" && value % 1 !== 0)
+      initial = value.toFixed(1);
     else initial = String(Math.round(value));
     setDraft(initial);
     openDraftRef.current = initial;
@@ -688,9 +753,11 @@ export function ScrubValue({
         <div style={{ flexShrink: 1, minWidth: 0, marginRight: 12 }}>
           <span
             style={{
-              fontSize: 12,
+              fontSize: prominent ? 11 : 12,
+              fontWeight: prominent ? 600 : 400,
               color: labelColor,
-              letterSpacing: "0.04em",
+              letterSpacing: prominent ? "0.12em" : "0.04em",
+              textTransform: prominent ? "uppercase" : "none",
               transition:
                 "color 0.32s cubic-bezier(0.16,1,0.3,1), opacity 0.32s cubic-bezier(0.16,1,0.3,1)",
             }}
@@ -728,15 +795,21 @@ export function ScrubValue({
           <span
             aria-hidden={editing}
             style={{
-              fontSize: 24,
-              fontWeight: 200,
-              color: scrubbing ? "var(--text-primary)" : "var(--text-secondary)",
-              letterSpacing: "-0.03em",
+              fontSize: prominent ? 22 : 24,
+              fontWeight: prominent ? 400 : 200,
+              color: scrubbing
+                ? "var(--text-primary)"
+                : prominent
+                  ? "var(--text-primary)"
+                  : "var(--text-secondary)",
+              letterSpacing: "-0.02em",
               fontFamily: "var(--font)",
               whiteSpace: "nowrap",
               fontVariantNumeric: "tabular-nums",
               opacity: editing ? 0 : 1,
-              transform: editing ? "translateY(-6px) scale(0.985)" : "translateY(0) scale(1)",
+              transform: editing
+                ? "translateY(-6px) scale(0.985)"
+                : "translateY(0) scale(1)",
               transformOrigin: "right center",
               transition:
                 "opacity 0.28s cubic-bezier(0.16,1,0.3,1), transform 0.32s cubic-bezier(0.16,1,0.3,1), color 0.32s cubic-bezier(0.16,1,0.3,1)",
@@ -755,7 +828,9 @@ export function ScrubValue({
               alignItems: "flex-end",
               width: "100%",
               opacity: editing ? 1 : 0,
-              transform: editing ? "translateY(0) scale(1)" : "translateY(8px) scale(0.985)",
+              transform: editing
+                ? "translateY(0) scale(1)"
+                : "translateY(8px) scale(0.985)",
               transformOrigin: "right top",
               transition:
                 "opacity 0.28s cubic-bezier(0.16,1,0.3,1), transform 0.32s cubic-bezier(0.16,1,0.3,1)",
@@ -771,7 +846,10 @@ export function ScrubValue({
               onChange={handleDraftChange}
               onBlur={() => commit(true)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") { e.preventDefault(); commit(false); }
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  commit(false);
+                }
                 if (e.key === "Escape") {
                   e.preventDefault();
                   setDraft(openDraftRef.current);
@@ -789,8 +867,8 @@ export function ScrubValue({
                   ? "1.5px solid var(--error, #e55)"
                   : "1px solid var(--border-strong)",
                 color: "var(--text-primary)",
-                fontSize: 24,
-                fontWeight: 200,
+                fontSize: prominent ? 20 : 24,
+                fontWeight: prominent ? 400 : 200,
                 textAlign: "right",
                 width: "100%",
                 maxWidth: 180,
@@ -812,73 +890,213 @@ export function ScrubValue({
                 marginTop: 4,
                 opacity: editing && isAmount ? 1 : 0,
                 maxHeight: editing && isAmount ? 14 : 0,
-                transform: editing && isAmount ? "translateY(0)" : "translateY(-4px)",
+                transform:
+                  editing && isAmount ? "translateY(0)" : "translateY(-4px)",
                 overflow: "hidden",
                 transition:
                   "opacity 0.28s cubic-bezier(0.16,1,0.3,1), max-height 0.28s cubic-bezier(0.16,1,0.3,1), transform 0.28s cubic-bezier(0.16,1,0.3,1)",
               }}
             >
-              {isAmount ? "type \"50L\" or \"1.5Cr\"" : "\u00A0"}
+              {isAmount ? 'type "50L" or "1.5Cr"' : "\u00A0"}
             </div>
           </div>
         </div>
       </div>
+      {prominent ? (
+        <ProminentTrack
+          pct={pct}
+          min={min}
+          max={max}
+          tickStep={tickStep}
+          scrubbing={scrubbing}
+          dotPulse={dotPulse}
+          boundaryHit={boundaryHit}
+        />
+      ) : (
+        <div
+          style={{
+            marginTop: 10,
+            height: scrubbing ? 3 : 2,
+            position: "relative",
+            borderRadius: 1.5,
+            overflow: "hidden",
+            transition: "height 0.28s cubic-bezier(0.16,1,0.3,1)",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: "var(--track-bg)",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              height: "100%",
+              width: `${pct}%`,
+              background: trackColor,
+              borderRadius: 1,
+              transition:
+                "background 0.32s cubic-bezier(0.16,1,0.3,1), opacity 0.32s cubic-bezier(0.16,1,0.3,1)",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: `${Math.max(0, pct - 18)}%`,
+              width: "24%",
+              minWidth: 36,
+              height: "100%",
+              opacity: scrubbing ? 0.9 : releaseFlash ? 0.55 : 0,
+              background:
+                "linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent)",
+              transform: `translateX(${dragDirection * 10}px)`,
+              transition:
+                "opacity var(--motion-medium) var(--ease-premium), transform var(--motion-medium) var(--ease-premium)",
+              pointerEvents: "none",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              left: `${pct}%`,
+              top: "50%",
+              transform: dotTransform,
+              width: dotWidth,
+              height: dotHeight,
+              borderRadius: 999,
+              background: "var(--dot-color)",
+              boxShadow: dotShadow,
+              transition: dotTransition,
+            }}
+          />
+        </div>
+      )}
+      {prominent && sublabel ? (
+        <div
+          style={{
+            marginTop: 8,
+            fontSize: 11,
+            color: "var(--text-muted)",
+            letterSpacing: "0.01em",
+          }}
+        >
+          {sublabel}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+interface ProminentTrackProps {
+  pct: number;
+  min: number;
+  max: number;
+  tickStep?: number;
+  scrubbing: boolean;
+  dotPulse: boolean;
+  boundaryHit: "min" | "max" | null;
+}
+
+function ProminentTrack({
+  pct,
+  min,
+  max,
+  tickStep,
+  scrubbing,
+  dotPulse,
+  boundaryHit,
+}: Readonly<ProminentTrackProps>) {
+  const tickCount = tickStep
+    ? Math.min(14, Math.max(3, Math.round((max - min) / tickStep) + 1))
+    : 0;
+  const ticks = [];
+  for (let i = 0; i < tickCount; i++) {
+    const tickPct = (i / (tickCount - 1)) * 100;
+    const behindThumb = tickPct <= pct;
+    ticks.push(
+      <div
+        key={i}
+        style={{
+          position: "absolute",
+          left: `${tickPct}%`,
+          top: 9,
+          width: 1,
+          height: 10,
+          background: behindThumb
+            ? "var(--text-muted)"
+            : "var(--text-muted-faint)",
+          opacity: 0.7,
+          transform: "translateX(-0.5px)",
+          transition:
+            "background 0.32s cubic-bezier(0.16,1,0.3,1), opacity 0.32s cubic-bezier(0.16,1,0.3,1)",
+          pointerEvents: "none",
+        }}
+      />,
+    );
+  }
+  const thumbSize = dotPulse ? 18 : 16;
+  const thumbShadow = scrubbing
+    ? "0 2px 4px rgba(0,0,0,0.2), 0 0 0 6px var(--fill-rest)"
+    : "0 2px 4px rgba(0,0,0,0.2)";
+
+  return (
+    <div
+      style={{
+        marginTop: 10,
+        height: 28,
+        position: "relative",
+      }}
+    >
+      {ticks}
       <div
         style={{
-          marginTop: 10,
-          height: scrubbing ? 3 : 2,
-          position: "relative",
-          borderRadius: 1.5,
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: 13,
+          height: 2,
+          background: "var(--fill-rest)",
+          borderRadius: 1,
           overflow: "hidden",
-          transition: "height 0.28s cubic-bezier(0.16,1,0.3,1)",
         }}
       >
-        <div style={{ position: "absolute", inset: 0, background: "var(--track-bg)" }} />
         <div
           style={{
             position: "absolute",
             left: 0,
             top: 0,
-            height: "100%",
+            bottom: 0,
             width: `${pct}%`,
-            background: trackColor,
+            background: "var(--bar-fill)",
             borderRadius: 1,
-            transition:
-              "background 0.32s cubic-bezier(0.16,1,0.3,1), opacity 0.32s cubic-bezier(0.16,1,0.3,1)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: `${Math.max(0, pct - 18)}%`,
-            width: "24%",
-            minWidth: 36,
-            height: "100%",
-            opacity: scrubbing ? 0.9 : releaseFlash ? 0.55 : 0,
-            background:
-              "linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent)",
-            transform: `translateX(${dragDirection * 10}px)`,
-            transition:
-              "opacity var(--motion-medium) var(--ease-premium), transform var(--motion-medium) var(--ease-premium)",
-            pointerEvents: "none",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            left: `${pct}%`,
-            top: "50%",
-            transform: dotTransform,
-            width: dotWidth,
-            height: dotHeight,
-            borderRadius: 999,
-            background: "var(--dot-color)",
-            boxShadow: dotShadow,
-            transition: dotTransition,
+            transition: scrubbing ? "none" : "width 0.12s ease-out",
           }}
         />
       </div>
+      <div
+        style={{
+          position: "absolute",
+          left: `${pct}%`,
+          top: 14,
+          width: thumbSize,
+          height: thumbSize,
+          marginLeft: -thumbSize / 2,
+          marginTop: -thumbSize / 2,
+          borderRadius: 999,
+          background: "var(--thumb)",
+          boxShadow: thumbShadow,
+          transition: dotPulse
+            ? "width 140ms cubic-bezier(0.16,1,0.3,1), height 140ms cubic-bezier(0.16,1,0.3,1), margin 140ms cubic-bezier(0.16,1,0.3,1), box-shadow 140ms cubic-bezier(0.16,1,0.3,1)"
+            : "width 220ms cubic-bezier(0.16,1,0.3,1), height 220ms cubic-bezier(0.16,1,0.3,1), margin 220ms cubic-bezier(0.16,1,0.3,1), box-shadow 220ms cubic-bezier(0.16,1,0.3,1)",
+          transform: boundaryHit ? "scale(1.06)" : "scale(1)",
+          pointerEvents: "none",
+        }}
+      />
     </div>
   );
 }

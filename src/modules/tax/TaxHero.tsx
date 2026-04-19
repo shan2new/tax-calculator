@@ -1,190 +1,113 @@
 "use client";
 
-import { HeroStage } from "@/components/ui/HeroStage";
 import { SmoothNumber } from "@/components/SmoothNumber";
-import { Haptic } from "@/hooks/useHaptic";
-import { usePremiumPress } from "@/hooks/usePremiumPress";
-import { fINR, fShort } from "@/lib/format";
+import { fShort } from "@/lib/format";
 
 interface TaxHeroProps {
-  heroView: number;
-  displayHeroView: number;
-  heroContentVisible: boolean;
   takeHome: number;
   betterRegime: "new" | "old" | "same";
   savings: number;
   effectiveRate: number;
-  totalNew: number;
-  totalOld: number;
-  income: number;
-  deductions: number;
-  cessNew: number;
-  verdictPulse: boolean;
-  tickPulse: boolean;
-  onCycle: () => void;
+  monthsWorked: number;
 }
 
 export function TaxHero({
-  heroView,
-  displayHeroView,
-  heroContentVisible,
   takeHome,
   betterRegime,
   savings,
   effectiveRate,
-  totalNew,
-  totalOld,
-  income,
-  deductions,
-  cessNew,
-  verdictPulse,
-  tickPulse,
-  onCycle,
+  monthsWorked,
 }: Readonly<TaxHeroProps>) {
-  const heroPress = usePremiumPress();
+  const midYear = monthsWorked < 12;
+  const eyebrow = midYear
+    ? `monthly take-home · ${monthsWorked} mo`
+    : "monthly take-home";
 
   return (
-    <HeroStage minHeight={260} paddingBottom={12}>
-      <div
-        {...heroPress.bind}
-        onClick={() => {
-          Haptic.light();
-          onCycle();
-        }}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            Haptic.light();
-            onCycle();
-          }
-        }}
-        role="button"
-        tabIndex={0}
+    <div
+      style={{
+        padding: "28px 20px 18px",
+        textAlign: "center",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      <span
         style={{
-          textAlign: "center",
-          cursor: "pointer",
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          flex: 1,
-          alignSelf: "stretch",
-          transform: heroPress.pressed
-            ? "translateY(1px) scale(0.992)"
-            : heroPress.hovered
-              ? "translateY(-1px)"
-              : "translateY(0)",
-          transition: "transform var(--motion-medium) var(--ease-premium)",
+          fontSize: 11,
+          fontWeight: 600,
+          letterSpacing: "0.14em",
+          color: "var(--text-muted)",
+          textTransform: "uppercase",
+          marginBottom: 14,
         }}
       >
-        <div
-          style={{
-            minHeight: 180,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            opacity: heroContentVisible ? 1 : 0,
-            transform: heroContentVisible ? "translateY(0) scale(1)" : "translateY(8px) scale(0.985)",
-            transition:
-              "opacity var(--motion-medium) var(--ease-premium), transform var(--motion-slow) var(--ease-premium)",
-          }}
-        >
-          {displayHeroView === 0 ? (
-            <>
-              <span
-                style={{
-                  fontSize: 9,
-                  letterSpacing: "0.14em",
-                  color: "var(--text-muted-faint)",
-                  textTransform: "uppercase",
-                  marginBottom: 12,
-                }}
-              >
-                monthly take-home
-              </span>
-              <SmoothNumber value={takeHome} prefix="₹" fontSize={40} />
-              <div
-                style={{
-                  marginTop: 16,
-                  fontSize: 12,
-                  color: "var(--text-muted-mid)",
-                  padding: "6px 14px",
-                  borderRadius: 999,
-                  background: "var(--card-bg)",
-                  border: "1px solid var(--border)",
-                  transform: verdictPulse || tickPulse ? "scale(1.02)" : "scale(1)",
-                  transition:
-                    "transform var(--motion-medium) var(--ease-premium), border-color var(--motion-medium) var(--ease-premium), background var(--motion-medium) var(--ease-premium)",
-                }}
-              >
-                {betterRegime !== "same" ? (
-                  <>
-                    <span style={{ color: "var(--text-primary)", fontWeight: 400 }}>
-                      {betterRegime === "new" ? "New" : "Old"} regime
-                    </span>{" "}
-                    saves {fShort(Math.abs(savings))}/yr
-                  </>
-                ) : (
-                  "Both regimes are equal"
-                )}
-              </div>
-              <div style={{ fontSize: 11, color: "var(--text-muted-faint)", marginTop: 10 }}>
-                {effectiveRate.toFixed(1)}% effective tax rate
-              </div>
-            </>
-          ) : null}
+        {eyebrow}
+      </span>
 
-          {displayHeroView === 1 ? (
-            <>
-              <span
-                style={{
-                  fontSize: 9,
-                  letterSpacing: "0.14em",
-                  color: "var(--text-muted-faint)",
-                  textTransform: "uppercase",
-                  marginBottom: 12,
-                }}
-              >
-                new regime
-              </span>
-              <SmoothNumber value={totalNew} prefix="₹" fontSize={36} />
-              <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 12 }}>
-                {fINR(Math.round(totalNew / 12))}/mo ·{" "}
-                {income > 0 ? ((totalNew / income) * 100).toFixed(1) : 0}% effective
-              </div>
-              <div style={{ fontSize: 10, color: "var(--text-muted-faint)", marginTop: 6 }}>
-                incl. ₹{Math.round(cessNew).toLocaleString("en-IN")} cess
-              </div>
-            </>
-          ) : null}
+      <SmoothNumber
+        value={takeHome}
+        prefix="₹"
+        fontSize={48}
+        fontWeight={300}
+        letterSpacing="-0.035em"
+      />
 
-          {displayHeroView === 2 ? (
-            <>
-              <span
-                style={{
-                  fontSize: 9,
-                  letterSpacing: "0.14em",
-                  color: "var(--text-muted-faint)",
-                  textTransform: "uppercase",
-                  marginBottom: 12,
-                }}
-              >
-                old regime
-              </span>
-              <SmoothNumber value={totalOld} prefix="₹" fontSize={36} />
-              <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 12 }}>
-                {fINR(Math.round(totalOld / 12))}/mo ·{" "}
-                {income > 0 ? ((totalOld / income) * 100).toFixed(1) : 0}% effective
-              </div>
-              <div style={{ fontSize: 10, color: "var(--text-muted-faint)", marginTop: 6 }}>
-                taxable: {fShort(Math.max(0, income - deductions))} after deductions
-              </div>
-            </>
-          ) : null}
-        </div>
+      <div
+        style={{
+          marginTop: 16,
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "7px 14px",
+          borderRadius: 999,
+          background: "var(--card-bg)",
+          border: "0.5px solid var(--border-strong)",
+          fontSize: 12,
+          fontVariantNumeric: "tabular-nums",
+          color: "var(--text-muted)",
+          transition:
+            "border-color var(--motion-medium) var(--ease-premium), background var(--motion-medium) var(--ease-premium)",
+        }}
+      >
+        {betterRegime !== "same" ? (
+          <>
+            <span
+              aria-hidden
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: 999,
+                background: "var(--accent)",
+                boxShadow: "0 0 8px var(--accent-glow)",
+                display: "inline-block",
+              }}
+            />
+            <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>
+              {betterRegime === "new" ? "New regime" : "Old regime"}
+            </span>
+            <span style={{ color: "var(--text-muted)" }}>
+              saves {fShort(Math.abs(savings))}/yr
+            </span>
+          </>
+        ) : (
+          <span style={{ color: "var(--text-primary)", fontWeight: 600 }}>
+            Both regimes equal
+          </span>
+        )}
       </div>
-    </HeroStage>
+
+      <div
+        style={{
+          marginTop: 10,
+          fontSize: 11,
+          color: "var(--text-muted)",
+          fontVariantNumeric: "tabular-nums",
+        }}
+      >
+        {effectiveRate.toFixed(1)}% effective tax rate
+      </div>
+    </div>
   );
 }

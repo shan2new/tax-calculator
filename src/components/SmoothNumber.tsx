@@ -6,6 +6,8 @@ interface SmoothNumberProps {
   value: number;
   prefix?: string;
   fontSize?: number;
+  fontWeight?: number;
+  letterSpacing?: string;
 }
 
 // Slightly softer, overdamped spring for premium glide without overshoot.
@@ -17,6 +19,8 @@ export function SmoothNumber({
   value,
   prefix = "₹",
   fontSize = 42,
+  fontWeight = 200,
+  letterSpacing = "-0.04em",
 }: Readonly<SmoothNumberProps>) {
   const posRef = useRef(value);
   const velRef = useRef(0);
@@ -54,7 +58,10 @@ export function SmoothNumber({
       // Large values (₹50L): settle within ₹50 (invisible at that scale)
       const threshold = Math.max(0.5, Math.abs(targetRef.current) * 0.000005);
       const velThreshold = Math.max(1, Math.abs(targetRef.current) * 0.00002);
-      if (Math.abs(diff) < threshold && Math.abs(velRef.current) < velThreshold) {
+      if (
+        Math.abs(diff) < threshold &&
+        Math.abs(velRef.current) < velThreshold
+      ) {
         posRef.current = targetRef.current;
         velRef.current = 0;
         setDisplay(targetRef.current);
@@ -78,9 +85,9 @@ export function SmoothNumber({
     <span
       style={{
         fontSize,
-        fontWeight: 200,
+        fontWeight,
         color: "var(--text-primary)",
-        letterSpacing: "-0.04em",
+        letterSpacing,
         fontFamily: "var(--font)",
         lineHeight: 1,
         display: "inline-block",

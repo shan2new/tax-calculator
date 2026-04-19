@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { TaxModule } from "@/modules/tax/TaxModule";
 
 vi.mock("@/components/SmoothNumber", () => ({
@@ -6,22 +6,17 @@ vi.mock("@/components/SmoothNumber", () => ({
 }));
 
 describe("TaxModule", () => {
-  it("renders the core tax controls", () => {
+  it("renders the FY badge and both scrub controls", () => {
     render(<TaxModule />);
 
     expect(screen.getByText("FY 2025–26")).toBeInTheDocument();
-    expect(screen.getByText("Gross income")).toBeInTheDocument();
-    expect(screen.getByText("Deductions (80C+D+HRA)")).toBeInTheDocument();
-    expect(screen.getByText("Tax slabs (New)")).toBeInTheDocument();
+    expect(screen.getAllByText("Gross income").length).toBeGreaterThan(0);
+    expect(screen.getByText("Deductions")).toBeInTheDocument();
   });
 
-  it("cycles the hero without crashing", () => {
+  it("always shows monthly take-home as the static headline", () => {
     render(<TaxModule />);
 
-    const hero = screen.getByText("monthly take-home").closest('[role="button"]');
-    expect(hero).not.toBeNull();
-    fireEvent.click(hero as HTMLElement);
-
-    expect(screen.getByText("FY 2025–26")).toBeInTheDocument();
+    expect(screen.getByText(/monthly take-home/i)).toBeInTheDocument();
   });
 });
